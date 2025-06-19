@@ -1,6 +1,7 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func, case
 
 app = Flask(__name__)
 
@@ -79,7 +80,6 @@ def chart():
 
 @app.route('/chart_data')
 def chart_data():
-    from sqlalchemy import func, case
     data = (
         db.session.query(
             Component.aircraft_registration,
@@ -94,19 +94,6 @@ def chart_data():
         'entradas': [d[1] for d in data],
         'salidas': [d[2] for d in data],
     })
-
-from flask import jsonify
-from sqlalchemy import text
-
-@app.route('/fix_sequence')
-def fix_sequence():
-    try:
-        # Ejecuta el SQL para sincronizar la secuencia del id
-        db.session.execute(text("SELECT setval('components_id_seq', (SELECT MAX(id) FROM components));"))
-        db.session.commit()
-        return jsonify({"status": "success", "message": "Secuencia del id sincronizada correctamente."})
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)})
 
 if __name__ == '__main__':
     with app.app_context():
