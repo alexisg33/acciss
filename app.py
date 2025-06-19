@@ -95,15 +95,17 @@ def chart_data():
         'entradas': [d[1] for d in data],
         'salidas': [d[2] for d in data],
     })
+    # Ejecutar script para agregar columna si no existe
+try:
+    import run_column_patch
+except Exception as e:
+    print(f"⚠️ Error ejecutando script: {e}")
+
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
-    # Ejecutar script para agregar columna si no existe
-try:
-    import run_column_patch
-except Exception as e:
-    print(f"⚠️ Error ejecutando script: {e}")
+   
 
