@@ -68,10 +68,23 @@ def register_in():
         return redirect('/inventory')
     return render_template('register_in.html')
 
-@app.route('/inventory')
+@app.route('/inventory', methods=['GET'])
 def inventory():
-    components = Component.query.filter((Component.output_date == '') | (Component.output_date == None)).all()
-    return render_template('inventory.html', components=components)
+    selected_aircraft = request.args.get('aircraft_registration', None)
+
+    query = Component.query.filter((Component.output_date == '') | (Component.output_date == None))
+
+    if selected_aircraft:
+        query = query.filter(Component.aircraft_registration == selected_aircraft)
+
+    components = query.all()
+
+    # Obtener lista de matrículas únicas para el filtro
+    aircrafts = db.session.query(Component.aircraft_registration).distinct().all()
+    aircrafts = [a[0] for a in aircrafts if a[0]]  # limpiar None
+
+    return render_template('inventory.html', components=components, aircrafts=aircrafts, selected_aircraft=selected_aircraft)
+
 
 @app.route('/register_out/<int:id>', methods=['POST'])
 def register_out(id):
