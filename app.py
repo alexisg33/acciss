@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, case
@@ -18,7 +19,7 @@ class Component(db.Model):
     part_number = db.Column(db.String)
     description = db.Column(db.String)
     serial_number = db.Column(db.String)
-    entry_date = db.Column(db.String)
+    entry_date = db.Column(db.String, default=lambda: datetime.now().strftime('%Y-%m-%d'))  # Fecha automática
     location = db.Column(db.String)
     status = db.Column(db.String)
     technician = db.Column(db.String)
@@ -32,15 +33,13 @@ class Component(db.Model):
 # Función para agregar la columna wo_number si no existe
 def add_wo_number_column():
     try:
-        # Solo se ejecuta si la columna no existe para evitar errores
         with db.engine.connect() as con:
             con.execute('ALTER TABLE components ADD COLUMN wo_number VARCHAR;')
         print("Columna 'wo_number' agregada correctamente.")
     except ProgrammingError as e:
         print("La columna 'wo_number' ya existe o error:", e)
 
-# Esta línea la comentamos para evitar que se ejecute cada vez
-# add_wo_number_column()
+# add_wo_number_column()  # Comentar esta línea una vez ejecutada
 
 @app.route('/')
 def index():
@@ -53,7 +52,7 @@ def register_in():
             part_number=request.form['part_number'],
             description=request.form['description'],
             serial_number=request.form['serial_number'],
-            entry_date=request.form.get('entry_date') or '',
+            # No seteamos entry_date, se guarda automáticamente
             location=request.form['location'],
             status=request.form['status'],
             technician=request.form['technician'],
@@ -100,10 +99,10 @@ def chart_data():
         db.session.query(
             Component.aircraft_registration,
             func.count(case(
-                ((Component.output_date == '') | (Component.output_date == None), 1)
+                ( (Component.output_date == '') | (Component.output_date == None), 1 )
             )).label('entradas'),
             func.count(case(
-                ((Component.output_date != '') & (Component.output_date != None), 1)
+                ( (Component.output_date != '') & (Component.output_date != None), 1 )
             )).label('salidas')
         )
         .filter(Component.aircraft_registration.isnot(None))
@@ -117,7 +116,6 @@ def chart_data():
         'entradas': [d[1] for d in data],
         'salidas': [d[2] for d in data],
     })
-
 
 if __name__ == '__main__':
     with app.app_context():
