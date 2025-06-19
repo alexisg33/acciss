@@ -95,6 +95,19 @@ def chart_data():
         'salidas': [d[2] for d in data],
     })
 
+from flask import jsonify
+from sqlalchemy import text
+
+@app.route('/fix_sequence')
+def fix_sequence():
+    try:
+        # Ejecuta el SQL para sincronizar la secuencia del id
+        db.session.execute(text("SELECT setval('components_id_seq', (SELECT MAX(id) FROM components));"))
+        db.session.commit()
+        return jsonify({"status": "success", "message": "Secuencia del id sincronizada correctamente."})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
