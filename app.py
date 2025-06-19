@@ -1,4 +1,5 @@
 import os
+import psycopg2
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, case
@@ -10,6 +11,28 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or 'sqlit
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+
+def add_wo_number_column():
+    database_url = os.environ.get('DATABASE_URL')
+    if not database_url:
+        print("No DATABASE_URL found, skipping migration")
+        return
+    try:
+        conn = psycopg2.connect(database_url)
+        cur = conn.cursor()
+        cur.execute("""
+            ALTER TABLE components
+            ADD COLUMN IF NOT EXISTS wo_number VARCHAR(255);
+        """)
+        conn.commit()
+        cur.close()
+        conn.close()
+        print("Migración: columna wo_number asegurada correctamente.")
+    except Exception as e:
+        print(f"Error al agregar columna wo_number: {e}")
+
+# Ejecutamos migración antes de crear tablas
+add_wo_number_column()
 
 class Component(db.Model):
     __tablename__ = 'components'
@@ -96,17 +119,9 @@ def chart_data():
         'entradas': [d[1] for d in data],
         'salidas': [d[2] for d in data],
     })
-    # Ejecutar script para agregar columna si no existe
-try:
-    import run_column_patch
-except Exception as e:
-    print(f"⚠️ Error ejecutando script: {e}")
-
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
-   
-
