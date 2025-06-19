@@ -2,7 +2,6 @@ import sqlite3
 from app import app, db, Component
 
 def migrate():
-    # Conectar a SQLite
     conn_sqlite = sqlite3.connect('components.db')
     cursor = conn_sqlite.cursor()
     cursor.execute("SELECT * FROM components")
@@ -10,9 +9,7 @@ def migrate():
 
     with app.app_context():
         for row in rows:
-            # Crea un objeto Component para cada fila
             component = Component(
-                id=row[0],
                 part_number=row[1],
                 description=row[2],
                 serial_number=row[3],
