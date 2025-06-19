@@ -44,6 +44,7 @@ def register_in():
             status=request.form['status'],
             technician=request.form['technician'],
             aircraft_registration=request.form['aircraft_registration'],
+            wo_number=request.form.get('wo_number') or '',
             output_location='',
             output_technician='',
             output_destination='',
