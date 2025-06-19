@@ -22,6 +22,7 @@ class Component(db.Model):
     status = db.Column(db.String)
     technician = db.Column(db.String)
     aircraft_registration = db.Column(db.String)
+    wo_number = db.Column(db.String)
     output_location = db.Column(db.String)
     output_technician = db.Column(db.String)
     output_destination = db.Column(db.String)
