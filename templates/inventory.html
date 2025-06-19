@@ -5,96 +5,81 @@
     <title>Inventario - A.C.C.I.S.S.</title>
     <style>
         body {
-            margin: 0;
             font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(to bottom right, #f0faff, #ffffff);
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            background-color: #f5f9ff;
+            margin: 0;
             padding: 20px;
+            color: #333;
         }
 
         h1 {
-            color: #007acc;
+            color: #0066cc;
+        }
+
+        form {
             margin-bottom: 20px;
+        }
+
+        select {
+            padding: 8px;
+            font-size: 14px;
         }
 
         table {
             width: 100%;
-            max-width: 1200px;
             border-collapse: collapse;
-            background-color: #fff;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 0 12px rgba(0, 122, 204, 0.2);
+            margin-top: 15px;
         }
 
         th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
+            border: 1px solid #d0e4ff;
+            padding: 8px;
+            text-align: center;
         }
 
         th {
-            background-color: #e6f4ff;
-            color: #007acc;
+            background-color: #eaf3ff;
+            color: #003366;
         }
 
-        tr:hover {
-            background-color: #f0faff;
+        tr:nth-child(even) {
+            background-color: #f0f8ff;
         }
 
-        input[type="text"], select {
-            padding: 6px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            background-color: #f9f9f9;
-            color: #333;
-            margin-bottom: 5px;
+        .form-section {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-start;
+            align-items: center;
         }
 
-        button {
+        .back-button {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 10px 16px;
             background-color: #007acc;
             color: white;
-            padding: 6px 10px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-top: 5px;
-        }
-
-        button:hover {
-            background-color: #005e99;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .filter-form {
-            margin-bottom: 20px;
-        }
-
-        .filter-form select {
-            padding: 8px;
+            text-decoration: none;
             border-radius: 6px;
-            border: 1px solid #ccc;
-            background-color: #fff;
-            color: #333;
+        }
+
+        .back-button:hover {
+            background-color: #005fa3;
         }
     </style>
 </head>
 <body>
+
     <h1>Inventario de Componentes</h1>
 
-    <form method="get" action="{{ url_for('inventory') }}" class="filter-form">
+    <form method="get" class="form-section">
         <label for="aircraft_registration">Filtrar por Matrícula:</label>
         <select name="aircraft_registration" id="aircraft_registration" onchange="this.form.submit()">
-            <option value="">-- Todas --</option>
+            <option value="">Todas</option>
             {% for aircraft in aircrafts %}
-                <option value="{{ aircraft }}" {% if selected_aircraft == aircraft %}selected{% endif %}>{{ aircraft }}</option>
+                <option value="{{ aircraft }}" {% if aircraft == selected_aircraft %}selected{% endif %}>
+                    {{ aircraft }}
+                </option>
             {% endfor %}
         </select>
     </form>
@@ -111,7 +96,7 @@
                 <th>Estado</th>
                 <th>Técnico</th>
                 <th>Matrícula</th>
-                <th>W.O.</th>
+                <th>Número de Tarea (W.O.)</th>
                 <th>Acción</th>
             </tr>
         </thead>
@@ -133,16 +118,15 @@
                         <input type="text" name="output_location" placeholder="Taller" required>
                         <input type="text" name="output_technician" placeholder="Técnico salida" required>
                         <input type="text" name="output_destination" placeholder="Destino" required>
-                        <button type="submit">Registrar</button>
+                        <button type="submit">Registrar Salida</button>
                     </form>
                 </td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="11" style="text-align:center;">No hay componentes disponibles.</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+
+    <a href="/" class="back-button">Volver al inicio</a>
+
 </body>
 </html>
