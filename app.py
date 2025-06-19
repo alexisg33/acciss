@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-# Configurar la base de datos PostgreSQL con variable de entorno
+# Configuración para PostgreSQL usando variable de entorno
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or 'sqlite:///components.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -54,7 +54,7 @@ def register_in():
 
 @app.route('/inventory')
 def inventory():
-    components = Component.query.filter_by(output_date='').all()
+    components = Component.query.filter((Component.output_date == '') | (Component.output_date == None)).all()
     return render_template('inventory.html', components=components)
 
 @app.route('/register_out/<int:id>', methods=['POST'])
@@ -83,55 +83,4 @@ def chart_data():
     data = (
         db.session.query(
             Component.aircraft_registration,
-            func.count(case((Component.output_date == '', 1))).label('entradas'),
-            func.count(case((Component.output_date != '', 1))).label('salidas')
-        )
-        .group_by(Component.aircraft_registration)
-        .all()
-    )
-    return jsonify({
-        'labels': [d[0] for d in data],
-        'entradas': [d[1] for d in data],
-        'salidas': [d[2] for d in data],
-    })
-import sqlite3
-from flask import current_app
-
-@app.route('/migrate_sqlite_to_postgres')
-def migrate():
-    try:
-        conn_sqlite = sqlite3.connect('components.db')
-        cursor = conn_sqlite.cursor()
-        cursor.execute("SELECT * FROM components")
-        rows = cursor.fetchall()
-
-        with current_app.app_context():
-            for row in rows:
-                component = Component(
-                    id=row[0],
-                    part_number=row[1],
-                    description=row[2],
-                    serial_number=row[3],
-                    entry_date=row[4] or '',
-                    location=row[5],
-                    status=row[6],
-                    technician=row[7],
-                    aircraft_registration=row[8],
-                    output_location=row[9] or '',
-                    output_technician=row[10] or '',
-                    output_destination=row[11] or '',
-                    output_date=row[12] or ''
-                )
-                db.session.add(component)
-            db.session.commit()
-        conn_sqlite.close()
-        return "✅ Migración completada"
-    except Exception as e:
-        return f"❌ Error en migración: {str(e)}"
-
-
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+            func.count(case((Component.output_date == '') | (Comp_
