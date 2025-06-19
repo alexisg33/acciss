@@ -99,19 +99,25 @@ def chart_data():
     data = (
         db.session.query(
             Component.aircraft_registration,
-            func.count(case([( (Component.output_date == '') | (Component.output_date == None), 1 )])).label('entradas'),
-            func.count(case([( (Component.output_date != '') & (Component.output_date != None), 1 )])).label('salidas')
+            func.count(case(
+                ((Component.output_date == '') | (Component.output_date == None), 1)
+            )).label('entradas'),
+            func.count(case(
+                ((Component.output_date != '') & (Component.output_date != None), 1)
+            )).label('salidas')
         )
-        .filter(Component.aircraft_registration != None)
+        .filter(Component.aircraft_registration.isnot(None))
         .filter(Component.aircraft_registration != '')
         .group_by(Component.aircraft_registration)
         .all()
     )
+
     return jsonify({
         'labels': [d[0] for d in data],
         'entradas': [d[1] for d in data],
         'salidas': [d[2] for d in data],
     })
+
 
 if __name__ == '__main__':
     with app.app_context():
