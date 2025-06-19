@@ -30,14 +30,16 @@ class Component(db.Model):
     output_destination = db.Column(db.String)
     output_date = db.Column(db.String)
 
-# Función auxiliar: una sola vez
-# def add_wo_number_column():
-#     try:
-#         with db.engine.connect() as con:
-#             con.execute('ALTER TABLE components ADD COLUMN wo_number VARCHAR;')
-#         print("Columna 'wo_number' agregada correctamente.")
-#     except ProgrammingError as e:
-#         print("La columna 'wo_number' ya existe o error:", e)
+# Función para agregar la columna wo_number si no existe
+def add_wo_number_column():
+    try:
+        with db.engine.connect() as con:
+            con.execute('ALTER TABLE components ADD COLUMN wo_number VARCHAR;')
+        print("Columna 'wo_number' agregada correctamente.")
+    except ProgrammingError as e:
+        print("La columna 'wo_number' ya existe o error:", e)
+
+# add_wo_number_column()  # Comentar esta línea una vez ejecutada
 
 @app.route('/')
 def index():
@@ -50,6 +52,7 @@ def register_in():
             part_number=request.form['part_number'],
             description=request.form['description'],
             serial_number=request.form['serial_number'],
+            # No seteamos entry_date, se guarda automáticamente
             location=request.form['location'],
             status=request.form['status'],
             technician=request.form['technician'],
@@ -76,10 +79,19 @@ def inventory():
 
     components = query.all()
 
-    aircrafts = db.session.query(Component.aircraft_registration).distinct().all()
-    aircrafts = [a[0] for a in aircrafts if a[0]]
+    # Solo matriculas con componentes activos (sin salida)
+    aircrafts = (
+        db.session.query(Component.aircraft_registration)
+        .filter((Component.output_date == '') | (Component.output_date == None))
+        .filter(Component.aircraft_registration.isnot(None))
+        .filter(Component.aircraft_registration != '')
+        .distinct()
+        .all()
+    )
+    aircrafts = [a[0] for a in aircrafts]
 
     return render_template('inventory.html', components=components, aircrafts=aircrafts, selected_aircraft=selected_aircraft)
+
 
 @app.route('/register_out/<int:id>', methods=['POST'])
 def register_out(id):
@@ -88,7 +100,7 @@ def register_out(id):
         component.output_location = request.form['output_location']
         component.output_technician = request.form['output_technician']
         component.output_destination = request.form['output_destination']
-        component.output_date = datetime.now().strftime('%Y-%m-%d')  # Fecha de salida automática
+        component.output_date = datetime.now().strftime('%Y-%m-%d')  # fecha automática al registrar salida
         db.session.commit()
     return redirect(url_for('inventory'))
 
