@@ -1,8 +1,8 @@
 import os
-import psycopg2
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, case
+from sqlalchemy.exc import ProgrammingError
 
 app = Flask(__name__)
 
@@ -11,28 +11,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or 'sqlit
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
-
-def add_wo_number_column():
-    database_url = os.environ.get('DATABASE_URL')
-    if not database_url:
-        print("No DATABASE_URL found, skipping migration")
-        return
-    try:
-        conn = psycopg2.connect(database_url)
-        cur = conn.cursor()
-        cur.execute("""
-            ALTER TABLE components
-            ADD COLUMN IF NOT EXISTS wo_number VARCHAR(255);
-        """)
-        conn.commit()
-        cur.close()
-        conn.close()
-        print("Migración: columna wo_number asegurada correctamente.")
-    except Exception as e:
-        print(f"Error al agregar columna wo_number: {e}")
-
-# Ejecutamos migración antes de crear tablas
-add_wo_number_column()
 
 class Component(db.Model):
     __tablename__ = 'components'
@@ -51,6 +29,19 @@ class Component(db.Model):
     output_destination = db.Column(db.String)
     output_date = db.Column(db.String)
 
+# Función para agregar la columna wo_number si no existe
+def add_wo_number_column():
+    try:
+        # Solo se ejecuta si la columna no existe para evitar errores
+        with db.engine.connect() as con:
+            con.execute('ALTER TABLE components ADD COLUMN wo_number VARCHAR;')
+        print("Columna 'wo_number' agregada correctamente.")
+    except ProgrammingError as e:
+        print("La columna 'wo_number' ya existe o error:", e)
+
+# Esta línea la comentamos para evitar que se ejecute cada vez
+# add_wo_number_column()
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -62,7 +53,7 @@ def register_in():
             part_number=request.form['part_number'],
             description=request.form['description'],
             serial_number=request.form['serial_number'],
-            entry_date=datetime.now().strftime('%Y-%m-%d'),  # fecha actual automática
+            entry_date=request.form.get('entry_date') or '',
             location=request.form['location'],
             status=request.form['status'],
             technician=request.form['technician'],
