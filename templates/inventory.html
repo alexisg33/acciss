@@ -87,46 +87,53 @@
 </head>
 <body>
     <h1>Inventario de Componentes</h1>
-    <table>
+    
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Número de Parte</th>
+        <th>Descripción</th>
+        <th>Número de Serie</th>
+        <th>Fecha de Entrada</th>
+        <th>Ubicación</th>
+        <th>Estado</th>
+        <th>Técnico</th>
+        <th>Matrícula</th>
+        <th>Número de Tarea (W.O.)</th>
+        <th>Acción</th>
+    </tr>
+    {% for comp in components %}
+        {% if not comp.output_date %}
         <tr>
-            <th>ID</th>
-            <th>Número de Parte</th>
-            <th>Descripción</th>
-            <th>Número de Serie</th>
-            <th>Fecha de Entrada</th>
-            <th>Ubicación</th>
-            <th>Estado</th>
-            <th>Técnico</th>
-            <th>Matrícula</th>
-            <th>Acción</th>
+            <td>{{ comp.id }}</td>
+            <td>{{ comp.part_number }}</td>
+            <td>{{ comp.description }}</td>
+            <td>{{ comp.serial_number }}</td>
+            <td>{{ comp.entry_date }}</td>
+            <td>{{ comp.location }}</td>
+            <td>{{ comp.status }}</td>
+            <td>{{ comp.technician }}</td>
+            <td>{{ comp.aircraft_registration }}</td>
+            <td>{{ comp.wo_number }}</td>
+            <td>
+              <form action="{{ url_for('register_out', id=comp.id) }}" method="post">
+                <input type="text" name="output_location" placeholder="Taller" required>
+                <input type="text" name="output_technician" placeholder="Técnico salida" required>
+                <input type="text" name="output_destination" placeholder="Destino" required>
+                <input type="submit" value="Registrar Salida">
+              </form>
+            </td>
         </tr>
-        {% for comp in components %}
-            {% if not comp.output_date %}
-            <tr>
-                <td>{{ comp.id }}</td>
-                <td>{{ comp.part_number }}</td>
-                <td>{{ comp.description }}</td>
-                <td>{{ comp.serial_number }}</td>
-                <td>{{ comp.entry_date }}</td>
-                <td>{{ comp.location }}</td>
-                <td>{{ comp.status }}</td>
-                <td>{{ comp.technician }}</td>
-                <td>{{ comp.aircraft_registration }}</td>
-                <td>
-                  <form action="{{ url_for('register_out', id=comp.id) }}" method="post">
-    <input type="text" name="output_location" placeholder="Taller" required>
-    <input type="text" name="output_technician" placeholder="Técnico salida" required>
-    <input type="text" name="output_destination" placeholder="Destino" required>
-    <input type="submit" value="Registrar Salida">
-</form>
-                </td>
-            </tr>
-            {% endif %}
-        {% endfor %}
-    </table>
+        {% endif %}
+    {% endfor %}
+</table>
+
 
     <div class="back-link">
         <a href="{{ url_for('index') }}">Volver al inicio</a>
     </div>
 </body>
 </html>
+Agrego columna "Número de Tarea (W.O.)" al inventario
+
