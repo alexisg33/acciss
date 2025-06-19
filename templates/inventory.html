@@ -1,138 +1,30 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Inventario - A.C.C.I.S.S.</title>
     <style>
         body {
-            background: linear-gradient(to bottom, #dbeeff, #ffffff);
-            font-family: 'Segoe UI', sans-serif;
-            margin: 0;
-            padding: 0;
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+            color: #333;
         }
-
         h1 {
-            text-align: center;
-            color: #003366;
-            padding: 20px 0;
+            color: #007ACC;
         }
-
+        form {
+            margin-bottom: 20px;
+        }
+        select {
+            padding: 5px 10px;
+            font-size: 1rem;
+        }
         table {
-            width: 95%;
-            margin: 0 auto;
+            width: 100%;
             border-collapse: collapse;
             background-color: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-
         th, td {
             padding: 10px;
-            text-align: center;
-            border-bottom: 1px solid #ddd;
-            font-size: 0.9rem;
-        }
-
-        th {
-            background-color: #007bff;
-            color: white;
-        }
-
-        tr:hover {
-            background-color: #f1f1f1;
-        }
-
-        .form-vertical {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            align-items: center;
-        }
-
-        .form-vertical input[type="text"] {
-            padding: 6px;
-            border-radius: 4px;
             border: 1px solid #ccc;
-            width: 100px;
-            font-size: 0.85rem;
-        }
-
-        .form-vertical input[type="submit"] {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.85rem;
-        }
-
-        .form-vertical input[type="submit"]:hover {
-            background-color: #0056b3;
-        }
-
-        .back-link {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .back-link a {
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        .back-link a:hover {
-            text-decoration: underline;
-        }
-    </style>
-</head>
-<body>
-    <h1>Inventario de Componentes</h1>
-    
-
-<table>
-    <tr>
-        <th>ID</th>
-        <th>Número de Parte</th>
-        <th>Descripción</th>
-        <th>Número de Serie</th>
-        <th>Fecha de Entrada</th>
-        <th>Ubicación</th>
-        <th>Estado</th>
-        <th>Técnico</th>
-        <th>Matrícula</th>
-        <th>Número de Tarea (W.O.)</th>
-        <th>Acción</th>
-    </tr>
-    {% for comp in components %}
-        {% if not comp.output_date %}
-        <tr>
-            <td>{{ comp.id }}</td>
-            <td>{{ comp.part_number }}</td>
-            <td>{{ comp.description }}</td>
-            <td>{{ comp.serial_number }}</td>
-            <td>{{ comp.entry_date }}</td>
-            <td>{{ comp.location }}</td>
-            <td>{{ comp.status }}</td>
-            <td>{{ comp.technician }}</td>
-            <td>{{ comp.aircraft_registration }}</td>
-            <td>{{ comp.wo_number }}</td>
-            <td>
-              <form action="{{ url_for('register_out', id=comp.id) }}" method="post">
-                <input type="text" name="output_location" placeholder="Taller" required>
-                <input type="text" name="output_technician" placeholder="Técnico salida" required>
-                <input type="text" name="output_destination" placeholder="Destino" required>
-                <input type="submit" value="Registrar Salida">
-              </form>
-            </td>
-        </tr>
-        {% endif %}
-    {% endfor %}
-</table>
-
-
-    <div class="back-link">
-        <a href="{{ url_for('index') }}">Volver al inicio</a>
-    </div>
-</body>
-</html>
-
