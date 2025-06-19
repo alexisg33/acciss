@@ -43,7 +43,8 @@ def register_in():
             request.form['location'],
             request.form['status'],
             request.form['technician'],
-            request.form['aircraft_registration']
+            request.form['aircraft_registration'],
+            request.form['wo_number']
         )
 
         conn = sqlite3.connect(DB_FILE)
@@ -51,9 +52,10 @@ def register_in():
         cursor.execute('''
             INSERT INTO components (
                 part_number, description, serial_number,
-                entry_date, location, status, technician, aircraft_registration
+                entry_date, location, status, technician,
+                aircraft_registration, wo_number
             )
-            VALUES (?, ?, ?, DATE('now'), ?, ?, ?, ?)
+            VALUES (?, ?, ?, DATE('now'), ?, ?, ?, ?, ?)
         ''', data)
         conn.commit()
         conn.close()
