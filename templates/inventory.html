@@ -10,31 +10,39 @@
             margin: 0;
             padding: 20px;
             color: #333;
+            text-align: center; /* Centra todo el contenido en body */
         }
 
         h1 {
             color: #0066cc;
+            margin-bottom: 20px;
         }
 
         form {
             margin-bottom: 20px;
+            display: inline-block; /* Para que el formulario no tome todo el ancho */
+            text-align: left; /* Texto dentro del form alineado a la izquierda */
+        }
+
+        label, select {
+            font-size: 14px;
+            vertical-align: middle;
         }
 
         select {
             padding: 8px;
-            font-size: 14px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
+            text-align: center;
         }
 
         th, td {
             border: 1px solid #d0e4ff;
             padding: 8px;
-            text-align: center;
         }
 
         th {
@@ -44,13 +52,6 @@
 
         tr:nth-child(even) {
             background-color: #f0f8ff;
-        }
-
-        .form-section {
-            display: flex;
-            gap: 8px;
-            justify-content: flex-start;
-            align-items: center;
         }
 
         .back-button {
