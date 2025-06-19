@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify, current_app
 import sqlite3
 import os
+import csv
 
 app = Flask(__name__)
 
@@ -136,33 +137,38 @@ def chart_data():
     }
     return jsonify(data)
 
-import csv
-from flask import current_app
-
 @app.route('/import_data')
 def import_data():
     try:
-        with current_app.app_context():
-            with open('components_export.csv', 'r', encoding='utf-8') as f:
-                reader = csv.DictReader(f)
-                for row in reader:
-                    component = Component(
-                        part_number=row['part_number'],
-                        description=row['description'],
-                        serial_number=row['serial_number'],
-                        entry_date=row['entry_date'],
-                        location=row['location'],
-                        status=row['status'],
-                        technician=row['technician'],
-                        aircraft_registration=row['aircraft_registration'],
-                        wo_number=row.get('wo_number'),
-                        output_location=row.get('output_location'),
-                        output_technician=row.get('output_technician'),
-                        output_destination=row.get('output_destination'),
-                        output_date=row.get('output_date')
-                    )
-                    db.session.add(component)
-                db.session.commit()
+        conn = sqlite3.connect(DB_FILE)
+        cursor = conn.cursor()
+
+        with open('components_export.csv', 'r', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                cursor.execute('''
+                    INSERT INTO components (
+                        part_number, description, serial_number,
+                        entry_date, location, status, technician,
+                        aircraft_registration, output_location,
+                        output_technician, output_destination, output_date
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (
+                    row['part_number'],
+                    row['description'],
+                    row['serial_number'],
+                    row['entry_date'],
+                    row['location'],
+                    row['status'],
+                    row['technician'],
+                    row['aircraft_registration'],
+                    row.get('output_location'),
+                    row.get('output_technician'),
+                    row.get('output_destination'),
+                    row.get('output_date')
+                ))
+        conn.commit()
+        conn.close()
         return "✅ Datos importados correctamente"
     except Exception as e:
         return f"❌ Error: {str(e)}"
