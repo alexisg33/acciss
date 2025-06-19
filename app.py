@@ -162,10 +162,10 @@ def import_data():
                     row['status'],
                     row['technician'],
                     row['aircraft_registration'],
-                    row.get('output_location'),
-                    row.get('output_technician'),
-                    row.get('output_destination'),
-                    row.get('output_date')
+                    row['output_location'],
+                    row['output_technician'],
+                    row['output_destination'],
+                    row['output_date']
                 ))
         conn.commit()
         conn.close()
