@@ -62,7 +62,7 @@ def register_in():
             part_number=request.form['part_number'],
             description=request.form['description'],
             serial_number=request.form['serial_number'],
-            entry_date=request.form.get('entry_date') or '',
+            entry_date=datetime.now().strftime('%Y-%m-%d'),  # fecha actual automática
             location=request.form['location'],
             status=request.form['status'],
             technician=request.form['technician'],
