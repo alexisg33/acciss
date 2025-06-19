@@ -140,12 +140,16 @@ def chart_data():
 @app.route('/import_data')
 def import_data():
     try:
-        conn = sqlite3.connect(DB_FILE)
-        cursor = conn.cursor()
-
         with open('components_export.csv', 'r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
+            # Mostrar en consola los nombres de las columnas del CSV
+            print("Encabezados CSV:", reader.fieldnames)
+
+            conn = sqlite3.connect(DB_FILE)
+            cursor = conn.cursor()
+
             for row in reader:
+                print("Fila keys:", list(row.keys()))
                 cursor.execute('''
                     INSERT INTO components (
                         part_number, description, serial_number,
@@ -154,18 +158,18 @@ def import_data():
                         output_technician, output_destination, output_date
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', (
-                    row['part_number'],
-                    row['description'],
-                    row['serial_number'],
-                    row['entry_date'],
-                    row['location'],
-                    row['status'],
-                    row['technician'],
-                    row['aircraft_registration'],
-                    row['output_location'],
-                    row['output_technician'],
-                    row['output_destination'],
-                    row['output_date']
+                    row.get('part_number'),
+                    row.get('description'),
+                    row.get('serial_number'),
+                    row.get('entry_date'),
+                    row.get('location'),
+                    row.get('status'),
+                    row.get('technician'),
+                    row.get('aircraft_registration'),
+                    row.get('output_location'),
+                    row.get('output_technician'),
+                    row.get('output_destination'),
+                    row.get('output_date')
                 ))
         conn.commit()
         conn.close()
