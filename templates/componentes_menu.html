@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Módulo de Componentes - A.C.C.I.S.S.</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f5f9ff;
+            margin: 0;
+            padding: 40px;
+            color: #333;
+            text-align: center;
+        }
+
+        h1 {
+            color: #0066cc;
+            margin-bottom: 30px;
+        }
+
+        .module-button {
+            background-color: #007bff;
+            color: white;
+            padding: 14px 28px;
+            margin: 12px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 16px;
+            display: inline-block;
+            transition: background-color 0.3s ease;
+        }
+
+        .module-button:hover {
+            background-color: #005fa3;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-top: 40px;
+            padding: 12px 24px;
+            background-color: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        .back-button:hover {
+            background-color: #005fa3;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Módulo de Componentes</h1>
+
+    <div>
+        <a href="{{ url_for('register_in') }}" class="module-button">Registrar Entrada</a>
+        <a href="{{ url_for('inventory') }}" class="module-button">Ver Inventario</a>
+        <a href="{{ url_for('chart') }}" class="module-button">Ver Gráficas</a>
+        <a href="{{ url_for('historial_salidas') }}" class="module-button">Historial de Salidas</a>
+    </div>
+
+    <a href="/" class="back-button">Volver al inicio</a>
+
+</body>
+</html>
