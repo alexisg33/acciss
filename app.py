@@ -138,6 +138,9 @@ def chart_data():
         'entradas': [d[1] for d in data],
         'salidas': [d[2] for d in data],
     })
+@app.route('/insumos')
+def insumos():
+    return render_template('insumos.html')
 
 if __name__ == '__main__':
     with app.app_context():
