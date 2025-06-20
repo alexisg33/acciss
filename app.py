@@ -7,7 +7,7 @@ from sqlalchemy.exc import ProgrammingError
 
 app = Flask(__name__)
 
-# Configuración para PostgreSQL o SQLite
+# Configuración para PostgreSQL usando variable de entorno, o SQLite por defecto
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or 'sqlite:///components.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -30,7 +30,7 @@ class Component(db.Model):
     output_destination = db.Column(db.String)
     output_date = db.Column(db.String)
 
-# Función para agregar columna si fuera necesario
+# Función para agregar columna wo_number si no existe (ejecutar una vez y comentar)
 def add_wo_number_column():
     try:
         with db.engine.connect() as con:
@@ -39,15 +39,27 @@ def add_wo_number_column():
     except ProgrammingError as e:
         print("La columna 'wo_number' ya existe o error:", e)
 
-# Rutas principales
+# add_wo_number_column()  # Ejecutar una vez y comentar
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html')  # Página con hexágonos
+
+@app.route('/hexagonos')
+def hexagonos():
+    return render_template('index.html')  # O puedes usar otra plantilla si quieres
 
 @app.route('/componentes')
 def componentes():
+    # Aquí puedes mostrar un menú con botones para componentes
     return render_template('componentes_menu.html')
+
+@app.route('/insumos')
+def insumos():
+    # Por ahora solo "Work in progress"
+    return render_template('insumos_menu.html')
+
+# --- Rutas ya existentes de registro e inventario componentes ---
 
 @app.route('/register_in', methods=['GET', 'POST'])
 def register_in():
@@ -82,7 +94,6 @@ def inventory():
 
     components = query.all()
 
-    # Solo mostrar matrículas con componentes activos
     aircrafts = (
         db.session.query(Component.aircraft_registration)
         .filter((Component.output_date == '') | (Component.output_date == None))
@@ -121,10 +132,10 @@ def chart_data():
         db.session.query(
             Component.aircraft_registration,
             func.count(case(
-                ((Component.output_date == '') | (Component.output_date == None), 1)
+                ( (Component.output_date == '') | (Component.output_date == None), 1 )
             )).label('entradas'),
             func.count(case(
-                ((Component.output_date != '') & (Component.output_date != None), 1)
+                ( (Component.output_date != '') & (Component.output_date != None), 1 )
             )).label('salidas')
         )
         .filter(Component.aircraft_registration.isnot(None))
@@ -138,9 +149,6 @@ def chart_data():
         'entradas': [d[1] for d in data],
         'salidas': [d[2] for d in data],
     })
-@app.route('/insumos')
-def insumos():
-    return render_template('insumos.html')
 
 if __name__ == '__main__':
     with app.app_context():

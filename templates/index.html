@@ -91,6 +91,25 @@
                 left: 11.5px;
             }
         }
+
+        /* Estilo para el botón "Ir al Menú" */
+        .main-button {
+            background-color: #007acc;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(0, 122, 204, 0.6);
+            transition: background-color 0.3s ease;
+            user-select: none;
+            margin-top: 30px;
+            display: inline-block;
+        }
+        .main-button:hover {
+            background-color: #005fa3;
+        }
     </style>
 </head>
 <body>
@@ -105,6 +124,8 @@
         <div class="hex" onclick="alert('Work in progress')">S</div>
         <div class="hex" onclick="alert('Work in progress')">S</div>
     </div>
+
+    <a href="{{ url_for('hexagonos') }}" class="main-button">Ir al Menú</a>
 
 </body>
 </html>
