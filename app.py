@@ -143,6 +143,9 @@ def chart_data():
         .group_by(Component.aircraft_registration)
         .all()
     )
+@app.route('/')
+def index():
+    return render_template('index.html')
 
     return jsonify({
         'labels': [d[0] for d in data],
