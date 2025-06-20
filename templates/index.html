@@ -1,74 +1,115 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>A.C.C.I.S.S.</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
-
     <style>
         body {
             background: linear-gradient(to bottom, #dbeeff, #ffffff);
             font-family: 'Segoe UI', sans-serif;
             margin: 0;
-            padding: 0;
+            padding: 40px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
         }
 
         h1 {
-            text-align: center;
-            margin-top: 100px;
-            font-size: 2.8em;
             color: #003366;
+            font-size: 2.8em;
+            margin-bottom: 40px;
+            user-select: none;
         }
 
-        .button-container {
-            text-align: center;
-            margin-top: 40px;
+        /* Contenedor hexágonos */
+        .hex-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            max-width: 650px;
+            justify-content: center;
         }
 
-        .main-button {
-            background-color: #007bff;
+        /* Hexágono botón */
+        .hex {
+            position: relative;
+            width: 100px;
+            height: 115px;
+            background-color: #007acc;
+            margin: 0 auto;
+            cursor: pointer;
+            user-select: none;
             color: white;
-            padding: 12px 24px;
-            text-decoration: none;
-            border-radius: 8px;
-            margin: 10px;
-            display: inline-block;
-            font-size: 1rem;
             font-weight: bold;
+            font-size: 3.2rem;
+            line-height: 115px;
+            text-align: center;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 122, 204, 0.6);
+            transition: background-color 0.3s ease;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .hex:hover {
+            background-color: #005fa3;
+        }
+
+        /* Forma de hexágono con pseudo-elementos */
+        .hex::before,
+        .hex::after {
+            content: "";
+            position: absolute;
+            width: 71px;
+            height: 71px;
+            background-color: inherit;
+            left: 14.5px;
+            transform: scaleY(0.5774) rotate(-45deg);
+            box-shadow: 0 4px 10px rgba(0, 122, 204, 0.6);
+            border-radius: 8px;
             transition: background-color 0.3s ease;
         }
 
-        .main-button:hover {
-            background-color: #0056b3;
+        .hex::after {
+            top: auto;
+            bottom: 0;
+            transform: scaleY(0.5774) rotate(45deg);
         }
-       .agi-tech {
-  position: fixed;
-  bottom: 10px;
-  right: 15px;
-  font-size: 0.9rem;
-  font-family: 'Orbitron', sans-serif;
-  color: #00c3ff;
-  background: rgba(0, 0, 0, 0.7);
-  padding: 6px 14px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 195, 255, 0.4);
-  z-index: 1000;
-  letter-spacing: 1px;
-}
 
-
+        /* Flex wrap for small screens */
+        @media (max-width: 480px) {
+            .hex-container {
+                max-width: 100%;
+                gap: 15px;
+            }
+            .hex {
+                width: 80px;
+                height: 92px;
+                font-size: 2.5rem;
+                line-height: 92px;
+            }
+            .hex::before,
+            .hex::after {
+                width: 57px;
+                height: 57px;
+                left: 11.5px;
+            }
+        }
     </style>
 </head>
-
 <body>
-    <h1>Bienvenido a A.C.C.I.S.S.</h1>
 
-    <div class="button-container">
-        <a href="{{ url_for('register_in') }}" class="main-button">Registrar Entrada</a>
-        <a href="{{ url_for('inventory') }}" class="main-button">Ver Inventario</a>
-        <a href="{{ url_for('chart') }}" class="main-button">Ver Gráficas</a>
-        <a href="{{ url_for('historial_salidas') }}" class="main-button">Historial de Salidas</a>
+    <h1>A.C.C.I.S.S.</h1>
+
+    <div class="hex-container">
+        <div class="hex" onclick="alert('Work in progress')">A</div>
+        <div class="hex" onclick="location.href='{{ url_for('inventory') }}'">C</div> <!-- Segundo C, componente activo -->
+        <div class="hex" onclick="alert('Work in progress')">C</div>
+        <div class="hex" onclick="location.href='{{ url_for('register_in') }}'">I</div> <!-- Insumos activo -->
+        <div class="hex" onclick="alert('Work in progress')">S</div>
+        <div class="hex" onclick="alert('Work in progress')">S</div>
     </div>
-    <div class="agi-tech">A.G.I. Technology</div>
+
 </body>
 </html>
