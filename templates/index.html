@@ -23,7 +23,6 @@
             user-select: none;
         }
 
-        /* Contenedor hexágonos */
         .hex-container {
             display: flex;
             gap: 20px;
@@ -32,7 +31,6 @@
             justify-content: center;
         }
 
-        /* Hexágono botón */
         .hex {
             position: relative;
             width: 100px;
@@ -56,7 +54,6 @@
             background-color: #005fa3;
         }
 
-        /* Forma de hexágono con pseudo-elementos */
         .hex::before,
         .hex::after {
             content: "";
@@ -68,7 +65,6 @@
             transform: scaleY(0.5774) rotate(-45deg);
             box-shadow: 0 4px 10px rgba(0, 122, 204, 0.6);
             border-radius: 8px;
-            transition: background-color 0.3s ease;
         }
 
         .hex::after {
@@ -77,7 +73,6 @@
             transform: scaleY(0.5774) rotate(45deg);
         }
 
-        /* Flex wrap for small screens */
         @media (max-width: 480px) {
             .hex-container {
                 max-width: 100%;
@@ -104,9 +99,9 @@
 
     <div class="hex-container">
         <div class="hex" onclick="alert('Work in progress')">A</div>
-        <div class="hex" onclick="location.href='{{ url_for('inventory') }}'">C</div> <!-- Segundo C, componente activo -->
+        <div class="hex" onclick="location.href='{{ url_for('componentes') }}'">C</div> <!-- Segunda C: Componentes -->
         <div class="hex" onclick="alert('Work in progress')">C</div>
-        <div class="hex" onclick="location.href='{{ url_for('register_in') }}'">I</div> <!-- Insumos activo -->
+        <div class="hex" onclick="location.href='{{ url_for('insumos') }}'">I</div>
         <div class="hex" onclick="alert('Work in progress')">S</div>
         <div class="hex" onclick="alert('Work in progress')">S</div>
     </div>

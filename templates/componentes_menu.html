@@ -5,47 +5,52 @@
     <title>Módulo de Componentes - A.C.C.I.S.S.</title>
     <style>
         body {
+            background: linear-gradient(to bottom, #dbeeff, #ffffff);
             font-family: 'Segoe UI', sans-serif;
-            background-color: #f5f9ff;
             margin: 0;
-            padding: 40px;
-            color: #333;
+            padding: 0;
             text-align: center;
+            color: #003366;
         }
 
         h1 {
-            color: #0066cc;
-            margin-bottom: 30px;
+            margin-top: 60px;
+            font-size: 2.5em;
         }
 
-        .module-button {
+        .button-container {
+            margin-top: 40px;
+        }
+
+        .main-button {
             background-color: #007bff;
             color: white;
-            padding: 14px 28px;
-            margin: 12px;
+            padding: 12px 24px;
             text-decoration: none;
             border-radius: 8px;
-            font-size: 16px;
+            margin: 10px;
             display: inline-block;
+            font-size: 1rem;
+            font-weight: bold;
             transition: background-color 0.3s ease;
         }
 
-        .module-button:hover {
-            background-color: #005fa3;
+        .main-button:hover {
+            background-color: #0056b3;
         }
 
         .back-button {
             display: inline-block;
-            margin-top: 40px;
-            padding: 12px 24px;
-            background-color: #007acc;
+            margin-top: 30px;
+            padding: 10px 20px;
+            background-color: #555;
             color: white;
             text-decoration: none;
             border-radius: 6px;
         }
 
         .back-button:hover {
-            background-color: #005fa3;
+            background-color: #333;
         }
     </style>
 </head>
@@ -53,14 +58,14 @@
 
     <h1>Módulo de Componentes</h1>
 
-    <div>
-        <a href="{{ url_for('register_in') }}" class="module-button">Registrar Entrada</a>
-        <a href="{{ url_for('inventory') }}" class="module-button">Ver Inventario</a>
-        <a href="{{ url_for('chart') }}" class="module-button">Ver Gráficas</a>
-        <a href="{{ url_for('historial_salidas') }}" class="module-button">Historial de Salidas</a>
+    <div class="button-container">
+        <a href="{{ url_for('register_in') }}" class="main-button">Registrar Entrada</a>
+        <a href="{{ url_for('inventory') }}" class="main-button">Ver Inventario</a>
+        <a href="{{ url_for('chart') }}" class="main-button">Ver Gráficas</a>
+        <a href="{{ url_for('historial_salidas') }}" class="main-button">Historial de Salidas</a>
     </div>
 
-    <a href="/" class="back-button">Volver al inicio</a>
+    <a href="{{ url_for('index') }}" class="back-button">Volver al inicio</a>
 
 </body>
 </html>

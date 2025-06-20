@@ -7,7 +7,7 @@ from sqlalchemy.exc import ProgrammingError
 
 app = Flask(__name__)
 
-# Configuración para PostgreSQL usando variable de entorno
+# Configuración para PostgreSQL o SQLite
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or 'sqlite:///components.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -19,7 +19,7 @@ class Component(db.Model):
     part_number = db.Column(db.String)
     description = db.Column(db.String)
     serial_number = db.Column(db.String)
-    entry_date = db.Column(db.String, default=lambda: datetime.now().strftime('%Y-%m-%d'))  # Fecha automática
+    entry_date = db.Column(db.String, default=lambda: datetime.now().strftime('%Y-%m-%d'))
     location = db.Column(db.String)
     status = db.Column(db.String)
     technician = db.Column(db.String)
@@ -30,7 +30,7 @@ class Component(db.Model):
     output_destination = db.Column(db.String)
     output_date = db.Column(db.String)
 
-# Función para agregar la columna wo_number si no existe
+# Función para agregar columna si fuera necesario
 def add_wo_number_column():
     try:
         with db.engine.connect() as con:
@@ -39,11 +39,15 @@ def add_wo_number_column():
     except ProgrammingError as e:
         print("La columna 'wo_number' ya existe o error:", e)
 
-# add_wo_number_column()  # Comentar esta línea una vez ejecutada
+# Rutas principales
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/componentes')
+def componentes():
+    return render_template('componentes_menu.html')
 
 @app.route('/register_in', methods=['GET', 'POST'])
 def register_in():
@@ -78,7 +82,7 @@ def inventory():
 
     components = query.all()
 
-    # Solo matrículas con componentes activos
+    # Solo mostrar matrículas con componentes activos
     aircrafts = (
         db.session.query(Component.aircraft_registration)
         .filter((Component.output_date == '') | (Component.output_date == None))
@@ -134,14 +138,6 @@ def chart_data():
         'entradas': [d[1] for d in data],
         'salidas': [d[2] for d in data],
     })
-
-@app.route('/componentes')
-def componentes():
-    return render_template('componentes_menu.html')
-
-@app.route('/insumos')
-def insumos():
-    return render_template('insumos.html')
 
 if __name__ == '__main__':
     with app.app_context():
