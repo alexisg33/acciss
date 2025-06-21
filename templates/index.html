@@ -25,8 +25,8 @@
 
         .hex-grid {
             display: grid;
-            grid-template-columns: repeat(3, 120px);
-            grid-template-rows: repeat(3, 120px);
+            grid-template-columns: 1fr;
+            grid-template-rows: 1fr;
             gap: 10px;
             justify-content: center;
             align-items: center;
@@ -35,10 +35,6 @@
         .hex-wrapper {
             text-align: center;
             visibility: visible;
-        }
-
-        .hex-empty {
-            visibility: hidden;
         }
 
         .hex {
@@ -94,17 +90,10 @@
     <h1>A.C.C.I.S.S.</h1>
 
     <div class="hex-grid">
-        <div class="hex-wrapper"><div class="hex" onclick="alert('En desarrollo')">A</div><div class="legend">Aeronave</div></div>
-        <div class="hex-wrapper"><div class="hex" onclick="location.href='{{ url_for('componentes') }}'">C</div><div class="legend">Componentes</div></div>
-        <div class="hex-wrapper"><div class="hex" onclick="alert('En desarrollo')">C</div><div class="legend">Control</div></div>
-
-        <div class="hex-wrapper"><div class="hex" onclick="alert('En desarrollo')">S</div><div class="legend">Seguimiento</div></div>
-        <div class="hex-empty"></div>
-        <div class="hex-wrapper"><div class="hex" onclick="location.href='{{ url_for('insumos') }}'">I</div><div class="legend">Insumos</div></div>
-
-        <div class="hex-wrapper"><div class="hex" onclick="alert('En desarrollo')">S</div><div class="legend">Sistema</div></div>
-        <div class="hex-empty"></div>
-        <div class="hex-empty"></div>
+        <div class="hex-wrapper">
+            <div class="hex" onclick="location.href='{{ url_for('componentes') }}'">C</div>
+            <div class="legend">Componentes</div>
+        </div>
     </div>
 
 </body>
