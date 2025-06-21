@@ -10,10 +10,10 @@
             margin: 0;
             padding: 40px 0;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
             flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
         }
 
         h1 {
@@ -23,17 +23,22 @@
             user-select: none;
         }
 
-        .hex-container {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            max-width: 700px;
+        .hex-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 120px);
+            grid-template-rows: repeat(3, 120px);
+            gap: 10px;
             justify-content: center;
+            align-items: center;
         }
 
         .hex-wrapper {
             text-align: center;
-            margin: 0 10px;
+            visibility: visible;
+        }
+
+        .hex-empty {
+            visibility: hidden;
         }
 
         .hex {
@@ -41,18 +46,16 @@
             width: 100px;
             height: 115px;
             background-color: #007acc;
-            margin: 0 auto;
+            margin: auto;
             cursor: pointer;
-            user-select: none;
             color: white;
             font-weight: bold;
-            font-size: 3.2rem;
+            font-size: 2.8rem;
             line-height: 115px;
             text-align: center;
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0, 122, 204, 0.6);
             transition: background-color 0.3s ease;
-            font-family: 'Segoe UI', sans-serif;
         }
 
         .hex:hover {
@@ -81,28 +84,8 @@
         .legend {
             color: #003366;
             font-weight: bold;
-            margin-top: 8px;
             font-size: 1rem;
-            user-select: none;
-        }
-
-        @media (max-width: 480px) {
-            .hex-container {
-                max-width: 100%;
-                gap: 15px;
-            }
-            .hex {
-                width: 80px;
-                height: 92px;
-                font-size: 2.5rem;
-                line-height: 92px;
-            }
-            .hex::before,
-            .hex::after {
-                width: 57px;
-                height: 57px;
-                left: 11.5px;
-            }
+            margin-top: 6px;
         }
     </style>
 </head>
@@ -110,38 +93,18 @@
 
     <h1>A.C.C.I.S.S.</h1>
 
-    <div class="hex-container">
+    <div class="hex-grid">
+        <div class="hex-wrapper"><div class="hex" onclick="alert('En desarrollo')">A</div><div class="legend">Aeronave</div></div>
+        <div class="hex-wrapper"><div class="hex" onclick="location.href='{{ url_for('componentes') }}'">C</div><div class="legend">Componentes</div></div>
+        <div class="hex-wrapper"><div class="hex" onclick="alert('En desarrollo')">C</div><div class="legend">Control</div></div>
 
-        <div class="hex-wrapper">
-            <div class="hex" onclick="alert('Work in progress')">A</div>
-            <div class="legend">A</div>
-        </div>
+        <div class="hex-wrapper"><div class="hex" onclick="alert('En desarrollo')">S</div><div class="legend">Seguimiento</div></div>
+        <div class="hex-empty"></div>
+        <div class="hex-wrapper"><div class="hex" onclick="location.href='{{ url_for('insumos') }}'">I</div><div class="legend">Insumos</div></div>
 
-        <div class="hex-wrapper">
-            <div class="hex" onclick="location.href='{{ url_for('componentes') }}'">C</div>
-            <div class="legend">Componente</div>
-        </div>
-
-        <div class="hex-wrapper">
-            <div class="hex" onclick="alert('Work in progress')">C</div>
-            <div class="legend">C</div>
-        </div>
-
-        <div class="hex-wrapper">
-            <div class="hex" onclick="location.href='{{ url_for('insumos') }}'">I</div>
-            <div class="legend">I</div>
-        </div>
-
-        <div class="hex-wrapper">
-            <div class="hex" onclick="alert('Work in progress')">S</div>
-            <div class="legend">S</div>
-        </div>
-
-        <div class="hex-wrapper">
-            <div class="hex" onclick="alert('Work in progress')">S</div>
-            <div class="legend">S</div>
-        </div>
-
+        <div class="hex-wrapper"><div class="hex" onclick="alert('En desarrollo')">S</div><div class="legend">Sistema</div></div>
+        <div class="hex-empty"></div>
+        <div class="hex-empty"></div>
     </div>
 
 </body>
