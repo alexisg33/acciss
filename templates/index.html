@@ -39,19 +39,22 @@
 
         .hex {
             position: relative;
-            width: 100px;
-            height: 115px;
+            width: 120px;
+            height: 130px;
             background-color: #007acc;
             margin: auto;
             cursor: pointer;
             color: white;
             font-weight: bold;
-            font-size: 2.8rem;
-            line-height: 115px;
             text-align: center;
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0, 122, 204, 0.6);
             transition: background-color 0.3s ease;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
         .hex:hover {
@@ -76,13 +79,6 @@
             bottom: 0;
             transform: scaleY(0.5774) rotate(45deg);
         }
-
-        .legend {
-            color: #003366;
-            font-weight: bold;
-            font-size: 1rem;
-            margin-top: 6px;
-        }
     </style>
 </head>
 <body>
@@ -91,8 +87,10 @@
 
     <div class="hex-grid">
         <div class="hex-wrapper">
-            <div class="hex" onclick="location.href='{{ url_for('componentes') }}'">C</div>
-            <div class="legend">Componentes</div>
+            <div class="hex" onclick="location.href='{{ url_for('componentes') }}'">
+                <div style="font-size: 2.8rem; line-height: 1; margin-bottom: 6px;">C</div>
+                <div style="font-size: 1rem; font-weight: normal;">Componentes</div>
+            </div>
         </div>
     </div>
 
