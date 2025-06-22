@@ -155,10 +155,9 @@ def chart_data():
         'salidas': [d[2] for d in data],
     })
 
-    if __name__ == '__main__':
-        with app.app_context():
-        db.create_all()  # ← esta línea debe estar indentada dentro del "with"
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
 
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
-
