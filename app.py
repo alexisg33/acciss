@@ -51,6 +51,48 @@ def insumos():
 def refrigerador_1():
     return render_template('refrigerador_1.html')
 
+@app.route('/refrigerador_1/info')
+def refrigerador_1_info():
+    # Simulación de datos, luego lo conectamos con base de datos si lo deseas
+    resinas = [
+        {"material": "Epoxy Adhesive", "part_number": "EA9390", "base": 100, "hardener": 56, "datasheet": ""},
+        {"material": "epoxy paste adhesive", "part_number": "EA9396", "base": 100, "hardener": 30, "datasheet": ""},
+        {"material": "Epoxy Type of Product Structural Adhesive", "part_number": "EY3804", "base": 100, "hardener": 66, "datasheet": ""},
+        {"material": "epoxy paste", "part_number": "EA9394", "base": 100, "hardener": 17, "datasheet": ""},
+        {"material": "thixotropic paste adhesive", "part_number": "EA934", "base": 100, "hardener": 33, "datasheet": ""},
+        {"material": "thixotropic paste adhesive", "part_number": "52A", "base": 100, "hardener": 41, "datasheet": ""},
+        {"material": "Epoxy Paste Adhesive", "part_number": "EA956", "base": 100, "hardener": 58, "datasheet": ""},
+        {"material": "Epoxy Paste Adhesive", "part_number": "EA9309.3NA", "base": 100, "hardener": 22, "datasheet": ""}
+    ]
+    return render_template('refrigerador_1_info.html', resinas=resinas)
+
+
+from werkzeug.utils import secure_filename
+
+UPLOAD_FOLDER = 'static/datasheets'
+ALLOWED_EXTENSIONS = {'pdf'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/upload_datasheet/<part_number>', methods=['GET', 'POST'])
+def upload_datasheet(part_number):
+    if request.method == 'POST':
+        if 'pdf_file' not in request.files:
+            return "No se subió ningún archivo"
+
+        file = request.files['pdf_file']
+        if file.filename == '':
+            return "Nombre de archivo vacío"
+
+        if file and allowed_file(file.filename):
+            filename = secure_filename(f"{part_number}.pdf")
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            return redirect(url_for('refrigerador_1_info'))
+
+    return render_template('upload_pdf.html', part_number=part_number)
+
 @app.route('/refrigerador_2')
 def refrigerador_2():
     return "Vista para Refrigerador 2"
