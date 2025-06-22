@@ -155,8 +155,10 @@ def chart_data():
         'salidas': [d[2] for d in data],
     })
 
-# Correr localmente
-if __name__ == '__main__':
-    with app.app_context():
+    if __name__ == '__main__':
+        with app.app_context():
         db.create_all()
-    app.run(debug=True)
+
+    port = int(os.environ.get('PORT', 5000))  # Usa el puerto que Render asigna o 5000 en local
+    app.run(host='0.0.0.0', port=port, debug=True)
+
