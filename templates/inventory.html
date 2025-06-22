@@ -83,6 +83,14 @@
         </select>
     </form>
 
+    <div style="text-align: right; margin-bottom: 20px;">
+    <form method="get" action="{{ url_for('inventory') }}">
+        <label for="search">🔎 Búsqueda específica y/o inteligente:</label>
+        <input type="text" id="search" name="search" placeholder="Número de parte, descripción, serie..." value="{{ request.args.get('search', '') }}">
+        <button type="submit">Buscar</button>
+    </form>
+</div>
+
     <table>
         <thead>
             <tr>

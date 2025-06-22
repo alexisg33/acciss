@@ -71,12 +71,20 @@ def register_in():
 
 @app.route('/inventory', methods=['GET'])
 def inventory():
-    selected_aircraft = request.args.get('aircraft_registration', None)
+    selected_aircraft = request.args.get('aircraft_registration')
+    search = request.args.get('search')
 
     query = Component.query.filter((Component.output_date == '') | (Component.output_date == None))
 
     if selected_aircraft:
         query = query.filter(Component.aircraft_registration == selected_aircraft)
+
+    if search:
+        query = query.filter(
+            (Component.part_number.ilike(f'%{search}%')) |
+            (Component.description.ilike(f'%{search}%')) |
+            (Component.serial_number.ilike(f'%{search}%'))
+        )
 
     components = query.all()
 
@@ -105,7 +113,18 @@ def register_out(id):
 
 @app.route('/historial_salidas')
 def historial_salidas():
-    salidas = Component.query.filter(Component.output_date != '').order_by(Component.output_date.desc()).all()
+    search = request.args.get('search')
+
+    query = Component.query.filter(Component.output_date != '')
+
+    if search:
+        query = query.filter(
+            (Component.part_number.ilike(f'%{search}%')) |
+            (Component.description.ilike(f'%{search}%')) |
+            (Component.serial_number.ilike(f'%{search}%'))
+        )
+
+    salidas = query.order_by(Component.output_date.desc()).all()
     return render_template('historial_salidas.html', salidas=salidas)
 
 @app.route('/chart')
@@ -136,9 +155,8 @@ def chart_data():
         'salidas': [d[2] for d in data],
     })
 
-# Para crear la base de datos y arrancar la app localmente
+# Correr localmente
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(debug=True)
