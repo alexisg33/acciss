@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>A.C.C.I.S.S. - Módulo Insumos</title>
+    <title>A.C.C.I.S.S. - Refrigerador 1</title>
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
@@ -31,10 +31,13 @@
         .menu-button:hover {
             background-color: #00695c;
         }
-        .sub-button-group {
-            text-align: center;
+        .content-section {
             display: none;
-            margin-top: 20px;
+            width: 90%;
+            margin: 0 auto;
+        }
+        .content-section.active {
+            display: block;
         }
     </style>
 </head>
@@ -43,19 +46,32 @@
     <h2>Módulo de Insumos</h2>
 
     <div class="button-group">
-        <button class="menu-button" onclick="toggleSubmenu()">Refrigerador 1</button>
+        <button class="menu-button" onclick="showSection('info')">Información de Insumos</button>
+        <button class="menu-button" onclick="showSection('stock')">Existencias / Stock</button>
+        <button class="menu-button" onclick="showSection('consumo')">Registro de Consumo</button>
     </div>
 
-    <div id="submenu" class="sub-button-group">
-        <button class="menu-button">Información de Insumos</button>
-        <button class="menu-button">Existencias / Stock</button>
-        <button class="menu-button">Registro de Consumo</button>
+    <div id="info" class="content-section active">
+        <h3>Información de Insumos</h3>
+        <!-- Aquí se puede incluir la tabla más adelante -->
+    </div>
+
+    <div id="stock" class="content-section">
+        <h3>Existencias / Stock</h3>
+        <p>Aquí se mostrarán las cantidades actuales, fechas de vencimiento y condiciones.</p>
+    </div>
+
+    <div id="consumo" class="content-section">
+        <h3>Registro de Consumo</h3>
+        <p>Aquí se agregará un formulario para registrar el consumo diario de materiales.</p>
     </div>
 
     <script>
-        function toggleSubmenu() {
-            const submenu = document.getElementById("submenu");
-            submenu.style.display = submenu.style.display === "none" || submenu.style.display === "" ? "block" : "none";
+        function showSection(id) {
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(id).classList.add('active');
         }
     </script>
 
