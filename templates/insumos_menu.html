@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Módulo de Insumos</title>
+    <style>
+        body {
+            background: linear-gradient(to bottom, #dbeeff, #ffffff);
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 40px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #003366;
+            font-size: 2.2em;
+            margin-bottom: 30px;
+        }
+
+        .menu-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .menu-button {
+            background-color: #007acc;
+            color: white;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .menu-button:hover {
+            background-color: #005fa3;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Módulo de Insumos</h2>
+
+    <div class="menu-buttons">
+        <button class="menu-button" onclick="location.href='{{ url_for('refrigerador_1') }}'">Refrigerador 1</button>
+        <button class="menu-button" onclick="location.href='{{ url_for('refrigerador_2') }}'">Refrigerador 2</button>
+        <button class="menu-button" onclick="location.href='{{ url_for('camara_frigorifica') }}'">Cámara Frigorífica</button>
+        <button class="menu-button" onclick="location.href='{{ url_for('rack_1') }}'">Rack 1</button>
+        <button class="menu-button" onclick="location.href='{{ url_for('rack_2') }}'">Rack 2</button>
+        <button class="menu-button" onclick="location.href='{{ url_for('rack_3') }}'">Rack 3</button>
+        <button class="menu-button" onclick="location.href='{{ url_for('rack_4') }}'">Rack 4</button>
+        <button class="menu-button" onclick="location.href='{{ url_for('gaveta_1') }}'">Gaveta 1</button>
+        <button class="menu-button" onclick="location.href='{{ url_for('gaveta_2') }}'">Gaveta 2</button>
+        <button class="menu-button" onclick="location.href='{{ url_for('gaveta_3') }}'">Gaveta 3</button>
+        <button class="menu-button" onclick="location.href='{{ url_for('coordinacion_insumos') }}'">Coordinación de Insumos</button>
+    </div>
+
+</body>
+</html>

@@ -46,6 +46,49 @@ def componentes():
 @app.route('/insumos')
 def insumos():
     return render_template('insumos_menu.html')
+@app.route('/refrigerador_1')
+def refrigerador_1():
+    return "Vista para Refrigerador 1"
+
+@app.route('/refrigerador_2')
+def refrigerador_2():
+    return "Vista para Refrigerador 2"
+
+@app.route('/camara_frigorifica')
+def camara_frigorifica():
+    return "Vista para Cámara Frigorífica"
+
+@app.route('/rack_1')
+def rack_1():
+    return "Vista para Rack 1"
+
+@app.route('/rack_2')
+def rack_2():
+    return "Vista para Rack 2"
+
+@app.route('/rack_3')
+def rack_3():
+    return "Vista para Rack 3"
+
+@app.route('/rack_4')
+def rack_4():
+    return "Vista para Rack 4"
+
+@app.route('/gaveta_1')
+def gaveta_1():
+    return "Vista para Gaveta 1"
+
+@app.route('/gaveta_2')
+def gaveta_2():
+    return "Vista para Gaveta 2"
+
+@app.route('/gaveta_3')
+def gaveta_3():
+    return "Vista para Gaveta 3"
+
+@app.route('/coordinacion_insumos')
+def coordinacion_insumos():
+    return "Vista para Coordinación de Insumos"
 
 @app.route('/register_in', methods=['GET', 'POST'])
 def register_in():
@@ -161,3 +204,4 @@ if __name__ == '__main__':
 
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
+    
