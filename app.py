@@ -88,6 +88,20 @@ def upload_datasheet(part_number):
             return redirect(url_for('refrigerador_1'))
     return render_template('upload_pdf.html', part_number=part_number)
 
+class StockItem(db.Model):
+    __tablename__ = 'stock_items'
+    id = db.Column(db.Integer, primary_key=True)
+    material_description = db.Column(db.String, nullable=False)
+    part_number = db.Column(db.String)
+    hazards_identified = db.Column(db.String)
+    date = db.Column(db.String)  # Ideal ISO format 'YYYY-MM-DD'
+    quantity = db.Column(db.Integer, default=0)
+    after_open = db.Column(db.String)
+    expiration_date = db.Column(db.String)
+    due_date_match = db.Column(db.String)
+    batch_number = db.Column(db.String)
+    comments = db.Column(db.String)
+
 @app.route('/refrigerador_2')
 def refrigerador_2():
     return "Vista para Refrigerador 2"
