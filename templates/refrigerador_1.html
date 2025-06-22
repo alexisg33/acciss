@@ -2,125 +2,62 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Refrigerador 1 - A.C.C.I.S.S.</title>
+    <title>A.C.C.I.S.S. - Módulo Insumos</title>
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(to bottom, #e4f9e8, #ffffff);
+            background: linear-gradient(to bottom, #e0f7fa, #ffffff);
             padding: 40px;
         }
         h2 {
-            color: #2e7d32;
             text-align: center;
+            color: #00695c;
         }
         .button-group {
             text-align: center;
-            margin-bottom: 30px;
+            margin: 20px 0;
         }
         .menu-button {
-            background-color: #43a047;
+            background-color: #00897b;
             color: white;
-            padding: 10px 16px;
+            padding: 10px 18px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 1em;
-            margin: 5px;
+            margin: 10px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s ease;
         }
         .menu-button:hover {
-            background-color: #2e7d32;
+            background-color: #00695c;
         }
-        .content-section {
-            display: none;
-            width: 90%;
-            margin: 0 auto;
-        }
-        /* Mostrar la sección activa */
-        .content-section.active {
-            display: block;
-        }
-        table {
-            width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        th, td {
-            padding: 10px;
-            border: 1px solid #b2dfdb;
+        .sub-button-group {
             text-align: center;
-        }
-        th {
-            background-color: #66bb6a;
-            color: white;
-        }
-        tr:nth-child(even) {
-            background-color: #f1f8e9;
+            display: none;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
 
-<h2>Refrigerador 1 - Gestión de Insumos (±4°C)</h2>
+    <h2>Módulo de Insumos</h2>
 
-<div class="button-group">
-    <button class="menu-button" onclick="showSection('info')">Información de Insumos</button>
-    <button class="menu-button" onclick="showSection('stock')">Existencias / Stock</button>
-    <button class="menu-button" onclick="showSection('consumo')">Registro de Consumo</button>
-</div>
+    <div class="button-group">
+        <button class="menu-button" onclick="toggleSubmenu()">Refrigerador 1</button>
+    </div>
 
-<div id="info" class="content-section active">
-    <h3>Información de Insumos</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Material</th>
-                <th>Part Number</th>
-                <th>Base (A)</th>
-                <th>Hardener (B)</th>
-                <th>Datasheet</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for r in resinas %}
-            <tr>
-                <td>{{ r.material }}</td>
-                <td>{{ r.part_number }}</td>
-                <td>{{ r.base }}</td>
-                <td>{{ r.hardener }}</td>
-                <td>
-                    <a href="{{ url_for('upload_datasheet', part_number=r.part_number) }}" class="menu-button">Subir</a>
-                    {% if r.part_number %}
-                        <a href="{{ url_for('static', filename='datasheets/' ~ r.part_number ~ '.pdf') }}" class="menu-button" target="_blank">Ver</a>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+    <div id="submenu" class="sub-button-group">
+        <button class="menu-button">Información de Insumos</button>
+        <button class="menu-button">Existencias / Stock</button>
+        <button class="menu-button">Registro de Consumo</button>
+    </div>
 
-<div id="stock" class="content-section">
-    <h3>Existencias / Stock</h3>
-    <p>Aquí se mostrarán las cantidades actuales, fechas de vencimiento y condiciones.</p>
-</div>
-
-<div id="consumo" class="content-section">
-    <h3>Registro de Consumo</h3>
-    <p>Aquí se agregará un formulario para registrar el consumo diario de materiales.</p>
-</div>
-
-<script>
-    function showSection(id) {
-        // Ocultar todas las secciones
-        document.querySelectorAll('.content-section').forEach(section => {
-            section.classList.remove('active');
-        });
-        // Mostrar la sección seleccionada
-        document.getElementById(id).classList.add('active');
-    }
-</script>
+    <script>
+        function toggleSubmenu() {
+            const submenu = document.getElementById("submenu");
+            submenu.style.display = submenu.style.display === "none" || submenu.style.display === "" ? "block" : "none";
+        }
+    </script>
 
 </body>
 </html>
