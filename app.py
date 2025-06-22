@@ -80,6 +80,9 @@ def upload_datasheet(part_number):
         if file.filename == '':
             return "Nombre de archivo vacío"
         if file and allowed_file(file.filename):
+            # Asegurar que la carpeta existe
+            os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
             filename = secure_filename(f"{part_number}.pdf")
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             return redirect(url_for('refrigerador_1'))
