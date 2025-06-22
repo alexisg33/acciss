@@ -3,12 +3,18 @@ from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, case
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
 # Configuración de la base de datos
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or 'sqlite:///components.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Carpeta para subir datasheets
+UPLOAD_FOLDER = 'static/datasheets'
+ALLOWED_EXTENSIONS = {'pdf'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 db = SQLAlchemy(app)
 
@@ -30,6 +36,10 @@ class Component(db.Model):
     output_destination = db.Column(db.String)
     output_date = db.Column(db.String)
 
+# Función para validar archivos
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 # Rutas
 @app.route('/')
 def index():
@@ -49,10 +59,6 @@ def insumos():
 
 @app.route('/refrigerador_1')
 def refrigerador_1():
-    return render_template('refrigerador_1.html')
-
-@app.route('/refrigerador_1')
-def refrigerador_1():
     resinas = [
         {"material": "Epoxy Adhesive", "part_number": "EA9390", "base": 100, "hardener": 56},
         {"material": "epoxy paste adhesive", "part_number": "EA9396", "base": 100, "hardener": 30},
@@ -65,32 +71,18 @@ def refrigerador_1():
     ]
     return render_template('refrigerador_1.html', resinas=resinas)
 
-
-
-from werkzeug.utils import secure_filename
-
-UPLOAD_FOLDER = 'static/datasheets'
-ALLOWED_EXTENSIONS = {'pdf'}
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
 @app.route('/upload_datasheet/<part_number>', methods=['GET', 'POST'])
 def upload_datasheet(part_number):
     if request.method == 'POST':
         if 'pdf_file' not in request.files:
             return "No se subió ningún archivo"
-
         file = request.files['pdf_file']
         if file.filename == '':
             return "Nombre de archivo vacío"
-
         if file and allowed_file(file.filename):
             filename = secure_filename(f"{part_number}.pdf")
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return redirect(url_for('refrigerador_1_info'))
-
+            return redirect(url_for('refrigerador_1'))
     return render_template('upload_pdf.html', part_number=part_number)
 
 @app.route('/refrigerador_2')
@@ -200,16 +192,13 @@ def register_out(id):
 @app.route('/historial_salidas')
 def historial_salidas():
     search = request.args.get('search')
-
     query = Component.query.filter(Component.output_date != '')
-
     if search:
         query = query.filter(
             (Component.part_number.ilike(f'%{search}%')) |
             (Component.description.ilike(f'%{search}%')) |
             (Component.serial_number.ilike(f'%{search}%'))
         )
-
     salidas = query.order_by(Component.output_date.desc()).all()
     return render_template('historial_salidas.html', salidas=salidas)
 
@@ -244,6 +233,5 @@ def chart_data():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
