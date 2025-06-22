@@ -51,20 +51,20 @@ def insumos():
 def refrigerador_1():
     return render_template('refrigerador_1.html')
 
-@app.route('/refrigerador_1/info')
-def refrigerador_1_info():
-    # Simulación de datos, luego lo conectamos con base de datos si lo deseas
+@app.route('/refrigerador_1')
+def refrigerador_1():
     resinas = [
-        {"material": "Epoxy Adhesive", "part_number": "EA9390", "base": 100, "hardener": 56, "datasheet": ""},
-        {"material": "epoxy paste adhesive", "part_number": "EA9396", "base": 100, "hardener": 30, "datasheet": ""},
-        {"material": "Epoxy Type of Product Structural Adhesive", "part_number": "EY3804", "base": 100, "hardener": 66, "datasheet": ""},
-        {"material": "epoxy paste", "part_number": "EA9394", "base": 100, "hardener": 17, "datasheet": ""},
-        {"material": "thixotropic paste adhesive", "part_number": "EA934", "base": 100, "hardener": 33, "datasheet": ""},
-        {"material": "thixotropic paste adhesive", "part_number": "52A", "base": 100, "hardener": 41, "datasheet": ""},
-        {"material": "Epoxy Paste Adhesive", "part_number": "EA956", "base": 100, "hardener": 58, "datasheet": ""},
-        {"material": "Epoxy Paste Adhesive", "part_number": "EA9309.3NA", "base": 100, "hardener": 22, "datasheet": ""}
+        {"material": "Epoxy Adhesive", "part_number": "EA9390", "base": 100, "hardener": 56},
+        {"material": "epoxy paste adhesive", "part_number": "EA9396", "base": 100, "hardener": 30},
+        {"material": "Epoxy Type of Product Structural Adhesive", "part_number": "EY3804", "base": 100, "hardener": 66},
+        {"material": "epoxy paste", "part_number": "EA9394", "base": 100, "hardener": 17},
+        {"material": "thixotropic paste adhesive", "part_number": "EA934", "base": 100, "hardener": 33},
+        {"material": "thixotropic paste adhesive", "part_number": "52A", "base": 100, "hardener": 41},
+        {"material": "Epoxy Paste Adhesive", "part_number": "EA956", "base": 100, "hardener": 58},
+        {"material": "Epoxy Paste Adhesive", "part_number": "EA9309.3NA", "base": 100, "hardener": 22}
     ]
-    return render_template('refrigerador_1_info.html', resinas=resinas)
+    return render_template('refrigerador_1.html', resinas=resinas)
+
 
 
 from werkzeug.utils import secure_filename
