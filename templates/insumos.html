@@ -2,36 +2,54 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
-    <title>Insumos - A.C.C.I.S.S.</title>
+    <title>Módulo de Insumos</title>
     <style>
         body {
-            font-family: 'Segoe UI', sans-serif;
             background: linear-gradient(to bottom, #dbeeff, #ffffff);
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
             padding: 40px;
-            color: #003366;
-        }
-        h1 {
             text-align: center;
-            margin-bottom: 40px;
         }
-        .back-button {
-            display: block;
-            width: 160px;
-            margin: 0 auto;
-            padding: 10px 20px;
+
+        h2 {
+            color: #003366;
+            font-size: 2.2em;
+            margin-bottom: 30px;
+        }
+
+        .menu-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .menu-button {
             background-color: #007acc;
             color: white;
-            text-align: center;
-            text-decoration: none;
-            border-radius: 6px;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
-        .back-button:hover {
+
+        .menu-button:hover {
             background-color: #005fa3;
         }
     </style>
 </head>
 <body>
-    <h1>Módulo Insumos - Work in Progress</h1>
-    <a href="{{ url_for('index') }}" class="back-button">Volver al Inicio</a>
+
+    <h2>Módulo de Insumos</h2>
+
+    <div class="menu-buttons">
+        <!-- Botones que tú definas -->
+        <button class="menu-button" onclick="location.href='{{ url_for('ruta_que_definas') }}'">Registrar Insumo</button>
+        <button class="menu-button" onclick="location.href='{{ url_for('otra_ruta') }}'">Inventario</button>
+    </div>
+
 </body>
 </html>
