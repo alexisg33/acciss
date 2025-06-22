@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Refrigerador 1 - Gestión de Insumos (±4°C)</title>
+    <title>Refrigerador 1 - A.C.C.I.S.S.</title>
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
@@ -79,21 +79,20 @@
             </tr>
         </thead>
         <tbody>
-            <!-- Ejemplo de datos, reemplaza con tu renderizado -->
+            {% for r in resinas %}
             <tr>
-                <td>Epoxy Adhesive</td>
-                <td>EA9390</td>
-                <td>100</td>
-                <td>56</td>
-                <td><a href="#" class="menu-button">Subir</a> <a href="#" class="menu-button" target="_blank">Ver</a></td>
+                <td>{{ r.material }}</td>
+                <td>{{ r.part_number }}</td>
+                <td>{{ r.base }}</td>
+                <td>{{ r.hardener }}</td>
+                <td>
+                    <a href="{{ url_for('upload_datasheet', part_number=r.part_number) }}" class="menu-button">Subir</a>
+                    {% if r.part_number %}
+                        <a href="{{ url_for('static', filename='datasheets/' ~ r.part_number ~ '.pdf') }}" class="menu-button" target="_blank">Ver</a>
+                    {% endif %}
+                </td>
             </tr>
-            <tr>
-                <td>Epoxy Paste Adhesive</td>
-                <td>EA9396</td>
-                <td>100</td>
-                <td>30</td>
-                <td><a href="#" class="menu-button">Subir</a> <a href="#" class="menu-button" target="_blank">Ver</a></td>
-            </tr>
+            {% endfor %}
         </tbody>
     </table>
 </div>
@@ -115,10 +114,8 @@
         document.getElementById(id).style.display = 'block';
     }
 
-    // Mostrar primero la sección de Información de Insumos
-    window.onload = function() {
-        showSection('info');
-    };
+    // Mostrar inicialmente solo la sección Información de Insumos
+    showSection('info');
 </script>
 
 </body>
