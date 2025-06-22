@@ -39,6 +39,24 @@
         .content-section.active {
             display: block;
         }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #b2dfdb;
+            text-align: center;
+        }
+        th {
+            background-color: #66bb6a;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f1f8e9;
+        }
     </style>
 </head>
 <body>
@@ -53,7 +71,33 @@
 
     <div id="info" class="content-section active">
         <h3>Información de Insumos</h3>
-        <!-- Aquí se puede incluir la tabla más adelante -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Material</th>
+                    <th>Part Number</th>
+                    <th>Base (A)</th>
+                    <th>Hardener (B)</th>
+                    <th>Datasheet</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in resinas %}
+                <tr>
+                    <td>{{ r.material }}</td>
+                    <td>{{ r.part_number }}</td>
+                    <td>{{ r.base }}</td>
+                    <td>{{ r.hardener }}</td>
+                    <td>
+                        <a href="{{ url_for('upload_datasheet', part_number=r.part_number) }}" class="menu-button">Subir</a>
+                        {% if r.part_number %}
+                            <a href="{{ url_for('static', filename='datasheets/' ~ r.part_number ~ '.pdf') }}" class="menu-button" target="_blank">Ver</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 
     <div id="stock" class="content-section">
