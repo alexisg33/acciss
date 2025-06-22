@@ -36,6 +36,10 @@
             width: 90%;
             margin: 0 auto;
         }
+        /* Mostrar la sección activa */
+        .content-section.active {
+            display: block;
+        }
         table {
             width: 100%;
             margin-top: 20px;
@@ -66,7 +70,7 @@
     <button class="menu-button" onclick="showSection('consumo')">Registro de Consumo</button>
 </div>
 
-<div id="info" class="content-section">
+<div id="info" class="content-section active">
     <h3>Información de Insumos</h3>
     <table>
         <thead>
@@ -109,13 +113,13 @@
 
 <script>
     function showSection(id) {
-        const sections = document.querySelectorAll('.content-section');
-        sections.forEach(section => section.style.display = 'none');
-        document.getElementById(id).style.display = 'block';
+        // Ocultar todas las secciones
+        document.querySelectorAll('.content-section').forEach(section => {
+            section.classList.remove('active');
+        });
+        // Mostrar la sección seleccionada
+        document.getElementById(id).classList.add('active');
     }
-
-    // Mostrar inicialmente solo la sección Información de Insumos
-    showSection('info');
 </script>
 
 </body>
