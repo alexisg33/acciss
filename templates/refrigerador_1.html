@@ -66,6 +66,7 @@
     <button class="menu-button" onclick="showSection('consumo')">Registro de Consumo</button>
 </div>
 
+<!-- Sección 1: Información de Insumos -->
 <div id="info" class="content-section">
     <h3>Información de Insumos</h3>
     <table>
@@ -97,11 +98,13 @@
     </table>
 </div>
 
+<!-- Sección 2: Existencias / Stock -->
 <div id="stock" class="content-section">
     <h3>Existencias / Stock</h3>
     <p>Aquí se mostrarán las cantidades actuales, fechas de vencimiento y condiciones.</p>
 </div>
 
+<!-- Sección 3: Registro de Consumo -->
 <div id="consumo" class="content-section">
     <h3>Registro de Consumo</h3>
     <p>Aquí se agregará un formulario para registrar el consumo diario de materiales.</p>
@@ -114,7 +117,7 @@
         document.getElementById(id).style.display = 'block';
     }
 
-    // Mostrar primero el de información
+    // Muestra la primera sección al cargar la página
     showSection('info');
 </script>
 
