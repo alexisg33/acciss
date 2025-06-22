@@ -23,61 +23,41 @@
             user-select: none;
         }
 
-        .hex-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            grid-template-rows: 1fr;
-            gap: 10px;
+        .grid {
+            display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        .hex-wrapper {
-            text-align: center;
-            visibility: visible;
-        }
-
-        .hex {
-            position: relative;
-            width: 120px;
-            height: 130px;
+        .box {
+            width: 150px;
+            height: 150px;
             background-color: #007acc;
-            margin: auto;
-            cursor: pointer;
-            color: white;
-            font-weight: bold;
-            text-align: center;
-            border-radius: 8px;
+            border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0, 122, 204, 0.6);
+            color: white;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
             transition: background-color 0.3s ease;
-
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
         }
 
-        .hex:hover {
+        .box:hover {
             background-color: #005fa3;
         }
 
-        .hex::before,
-        .hex::after {
-            content: "";
-            position: absolute;
-            width: 71px;
-            height: 71px;
-            background-color: inherit;
-            left: 14.5px;
-            transform: scaleY(0.5774) rotate(-45deg);
-            box-shadow: 0 4px 10px rgba(0, 122, 204, 0.6);
-            border-radius: 8px;
+        .box .letra {
+            font-size: 3rem;
+            margin-bottom: 6px;
         }
 
-        .hex::after {
-            top: auto;
-            bottom: 0;
-            transform: scaleY(0.5774) rotate(45deg);
+        .box .texto {
+            font-size: 1rem;
+            font-weight: normal;
         }
     </style>
 </head>
@@ -85,12 +65,10 @@
 
     <h1>A.C.C.I.S.S.</h1>
 
-    <div class="hex-grid">
-        <div class="hex-wrapper">
-            <div class="hex" onclick="location.href='{{ url_for('componentes') }}'">
-                <div style="font-size: 2.8rem; line-height: 1; margin-bottom: 6px;">C</div>
-                <div style="font-size: 1rem; font-weight: normal;">Componentes</div>
-            </div>
+    <div class="grid">
+        <div class="box" onclick="location.href='{{ url_for('componentes') }}'">
+            <div class="letra">C</div>
+            <div class="texto">Componentes</div>
         </div>
     </div>
 
