@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Refrigerador 1 - A.C.C.I.S.S.</title>
+    <title>Refrigerador 1 - Gestión de Insumos (±4°C)</title>
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
@@ -66,7 +66,6 @@
     <button class="menu-button" onclick="showSection('consumo')">Registro de Consumo</button>
 </div>
 
-<!-- Sección 1: Información de Insumos -->
 <div id="info" class="content-section">
     <h3>Información de Insumos</h3>
     <table>
@@ -80,31 +79,30 @@
             </tr>
         </thead>
         <tbody>
-            {% for r in resinas %}
+            <!-- Ejemplo de datos, reemplaza con tu renderizado -->
             <tr>
-                <td>{{ r.material }}</td>
-                <td>{{ r.part_number }}</td>
-                <td>{{ r.base }}</td>
-                <td>{{ r.hardener }}</td>
-                <td>
-                    <a href="{{ url_for('upload_datasheet', part_number=r.part_number) }}" class="menu-button">Subir</a>
-                    {% if r.part_number %}
-                        <a href="{{ url_for('static', filename='datasheets/' ~ r.part_number ~ '.pdf') }}" class="menu-button" target="_blank">Ver</a>
-                    {% endif %}
-                </td>
+                <td>Epoxy Adhesive</td>
+                <td>EA9390</td>
+                <td>100</td>
+                <td>56</td>
+                <td><a href="#" class="menu-button">Subir</a> <a href="#" class="menu-button" target="_blank">Ver</a></td>
             </tr>
-            {% endfor %}
+            <tr>
+                <td>Epoxy Paste Adhesive</td>
+                <td>EA9396</td>
+                <td>100</td>
+                <td>30</td>
+                <td><a href="#" class="menu-button">Subir</a> <a href="#" class="menu-button" target="_blank">Ver</a></td>
+            </tr>
         </tbody>
     </table>
 </div>
 
-<!-- Sección 2: Existencias / Stock -->
 <div id="stock" class="content-section">
     <h3>Existencias / Stock</h3>
     <p>Aquí se mostrarán las cantidades actuales, fechas de vencimiento y condiciones.</p>
 </div>
 
-<!-- Sección 3: Registro de Consumo -->
 <div id="consumo" class="content-section">
     <h3>Registro de Consumo</h3>
     <p>Aquí se agregará un formulario para registrar el consumo diario de materiales.</p>
@@ -117,8 +115,10 @@
         document.getElementById(id).style.display = 'block';
     }
 
-    // Muestra la primera sección al cargar la página
-    showSection('info');
+    // Mostrar primero la sección de Información de Insumos
+    window.onload = function() {
+        showSection('info');
+    };
 </script>
 
 </body>
