@@ -46,9 +46,10 @@ def componentes():
 @app.route('/insumos')
 def insumos():
     return render_template('insumos_menu.html')
+
 @app.route('/refrigerador_1')
 def refrigerador_1():
-    return "Vista para Refrigerador 1"
+    return render_template('refrigerador_1.html')
 
 @app.route('/refrigerador_2')
 def refrigerador_2():
@@ -204,4 +205,3 @@ if __name__ == '__main__':
 
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
-    
