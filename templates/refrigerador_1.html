@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8">
     <title>Refrigerador 1 - A.C.C.I.S.S.</title>
     <style>
         body {
@@ -26,8 +26,6 @@
             font-size: 1em;
             margin: 5px;
             cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
             transition: background-color 0.3s;
         }
         .menu-button:hover {
@@ -58,15 +56,12 @@
 <h2>Refrigerador 1 - Gestión de Insumos (±4°C)</h2>
 
 <div class="button-group">
-    <!-- Botón como enlace con ancla -->
-    <a href="#info_insumos" class="menu-button">Información de Insumos</a>
-    <button class="menu-button" onclick="alert('Aquí iría Existencias / Stock')">Existencias / Stock</button>
-    <button class="menu-button" onclick="alert('Aquí iría Registro de Consumo')">Registro de Consumo</button>
+    <button class="menu-button" onclick="toggleTable()">Información de Insumos</button>
+    <button class="menu-button" onclick="alert('Existencias / Stock próximamente')">Existencias / Stock</button>
+    <button class="menu-button" onclick="alert('Registro de Consumo próximamente')">Registro de Consumo</button>
 </div>
 
-<!-- Contenedor con ID para el ancla -->
-<div id="info_insumos">
-    <h3>Información de Insumos</h3>
+<div id="tabla-insumos" style="display:none; margin-top:20px;">
     <table>
         <thead>
             <tr>
@@ -87,7 +82,7 @@
                 <td>
                     <a href="{{ url_for('upload_datasheet', part_number=r.part_number) }}" class="menu-button">Subir</a>
                     {% if r.part_number %}
-                    <a href="{{ url_for('static', filename='datasheets/' ~ r.part_number ~ '.pdf') }}" class="menu-button" target="_blank">Ver</a>
+                        <a href="{{ url_for('static', filename='datasheets/' ~ r.part_number ~ '.pdf') }}" class="menu-button" target="_blank">Ver</a>
                     {% endif %}
                 </td>
             </tr>
@@ -95,6 +90,18 @@
         </tbody>
     </table>
 </div>
+
+<script>
+function toggleTable() {
+    const tabla = document.getElementById('tabla-insumos');
+    if (tabla.style.display === 'none' || tabla.style.display === '') {
+        tabla.style.display = 'block';
+        tabla.scrollIntoView({behavior: 'smooth'});
+    } else {
+        tabla.style.display = 'none';
+    }
+}
+</script>
 
 </body>
 </html>
