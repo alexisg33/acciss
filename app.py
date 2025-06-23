@@ -192,19 +192,19 @@ def camara_frigorifica():
 
 @app.route('/Rack_1')
 def rack_1():
-    return "Vista para Cámara Rack 1"
+    return "Vista para Rack 1"
 
 @app.route('/Rack_2')
 def rack_2():
-    return "Vista para Cámara Rack 2"
+    return "Vista para Rack 2"
 
 @app.route('/Rack_3')
 def rack_3():
-    return "Vista para Cámara Rack 3"
+    return "Vista para Rack 3"
 
 @app.route('/Rack_4')
 def rack_4():
-    return "Vista para Cámara Rack 4"
+    return "Vista para Rack 4"
 
 @app.route('/Gaveta_1')
 def gaveta_1():
