@@ -288,6 +288,45 @@ def chart_data():
         'salidas': [d[2] for d in data],
     })
 
+# Rutas para registrar resina y baja stock con fecha automática
+@app.route('/registrar_resina', methods=['POST'])
+def registrar_resina():
+    data = request.json
+    nueva_resina = StockItem(
+        material_description = data.get('material_description', ''),
+        part_number = data.get('part_number', ''),
+        hazards_identified = data.get('hazards_identified', ''),
+        date = datetime.now().strftime('%Y-%m-%d'),  # fecha actual automática
+        quantity = int(data.get('quantity', 0)),
+        after_open = data.get('after_open', ''),
+        expiration_date = data.get('expiration_date', ''),
+        due_date_match = data.get('due_date_match', ''),
+        batch_number = data.get('batch_number', ''),
+        comments = data.get('comments', '')
+    )
+    db.session.add(nueva_resina)
+    db.session.commit()
+    return jsonify({'status': 'success'})
+
+@app.route('/registrar_baja', methods=['POST'])
+def registrar_baja():
+    data = request.json
+    baja = StockItem(
+        material_description = 'BAJA',
+        part_number = '',
+        hazards_identified = '',
+        date = datetime.now().strftime('%Y-%m-%d'),
+        quantity = 0,
+        after_open = '',
+        expiration_date = '',
+        due_date_match = data.get('due_date_match', ''),
+        batch_number = data.get('batch_number', ''),
+        comments = data.get('comments', '')
+    )
+    db.session.add(baja)
+    db.session.commit()
+    return jsonify({'status': 'success'})
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
