@@ -1,3 +1,5 @@
+# app.py - Versión final corregida
+
 import os
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, jsonify
@@ -6,18 +8,14 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
-# Configuración de la base de datos (PostgreSQL si está en env, SQLite local si no)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or 'sqlite:///components.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-# Carpeta para subir datasheets PDFs
 UPLOAD_FOLDER = 'static/datasheets'
 ALLOWED_EXTENSIONS = {'pdf'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 db = SQLAlchemy(app)
 
-# Modelos
 class Component(db.Model):
     __tablename__ = 'components'
     id = db.Column(db.Integer, primary_key=True)
@@ -41,7 +39,7 @@ class StockItem(db.Model):
     material_description = db.Column(db.String, nullable=False)
     part_number = db.Column(db.String)
     hazards_identified = db.Column(db.String)
-    date = db.Column(db.String)  # ISO 'YYYY-MM-DD'
+    date = db.Column(db.String)
     quantity = db.Column(db.Integer, default=0)
     after_open = db.Column(db.String)
     expiration_date = db.Column(db.String)
@@ -49,11 +47,18 @@ class StockItem(db.Model):
     batch_number = db.Column(db.String)
     comments = db.Column(db.String)
 
-# Funciones
+class StockBaja(db.Model):
+    __tablename__ = 'stock_bajas'
+    id = db.Column(db.Integer, primary_key=True)
+    stock_id = db.Column(db.Integer)
+    employee_id = db.Column(db.String)
+    date = db.Column(db.String)
+    quantity = db.Column(db.Integer)
+    comments = db.Column(db.String)
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Rutas
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -72,7 +77,6 @@ def insumos():
 
 @app.route('/refrigerador_1')
 def refrigerador_1():
-    # Lista fija para demo, ideal cargar de DB si quieres
     resinas = [
         {"material": "Epoxy Adhesive", "part_number": "EA9390", "base": 100, "hardener": 56},
         {"material": "Epoxy Paste Adhesive", "part_number": "EA9396", "base": 100, "hardener": 30},
@@ -101,11 +105,6 @@ def upload_datasheet(part_number):
             return redirect(url_for('refrigerador_1'))
     return render_template('upload_pdf.html', part_number=part_number)
 
-@app.route('/existencias_stock', methods=['GET'])
-def existencias_stock():
-    materiales = StockItem.query.all()
-    return render_template('existencias_stock.html', materiales=materiales)
-
 @app.route('/update_stock_field', methods=['POST'])
 def update_stock_field():
     data = request.json
@@ -121,47 +120,59 @@ def update_stock_field():
     db.session.commit()
     return jsonify({'status': 'success'})
 
-@app.route('/update_component_field', methods=['POST'])
-def update_component_field():
+@app.route('/get_material_info/<int:id>', methods=['GET'])
+def get_material_info(id):
+    material = StockItem.query.get(id)
+    if material:
+        return jsonify({
+            'material_description': material.material_description,
+            'part_number': material.part_number,
+            'due_date_match': material.due_date_match,
+            'batch_number': material.batch_number
+        })
+    return jsonify(None), 404
+
+@app.route('/registrar_resina', methods=['POST'])
+def registrar_resina():
     data = request.json
-    comp_id = data.get('id')
-    field = data.get('field')
-    value = data.get('value')
-
-    component = Component.query.get(comp_id)
-    if not component or field not in Component.__table__.columns.keys():
-        return jsonify({'status': 'error', 'message': 'Elemento o campo inválido'}), 400
-
-    setattr(component, field, value)
+    nueva = StockItem(
+        material_description=data['material_description'],
+        part_number=data['part_number'],
+        hazards_identified=data['hazards_identified'],
+        date=datetime.now().strftime('%Y-%m-%d'),
+        quantity=int(data['quantity']),
+        after_open=data['after_open'],
+        expiration_date=data['expiration_date'],
+        due_date_match=data['due_date_match'],
+        batch_number=data['batch_number'],
+        comments=data['comments']
+    )
+    db.session.add(nueva)
     db.session.commit()
     return jsonify({'status': 'success'})
 
-# Ruta para la "baja" con el id, cantidad y número de empleado
 @app.route('/registrar_baja', methods=['POST'])
 def registrar_baja():
     data = request.json
-    material_id = data.get('id')
-    employee_id = data.get('employee_id')
-    quantity = int(data.get('quantity'))
+    material_id = int(data['id'])
+    employee_id = data['employee_id']
+    cantidad = int(data['quantity'])
 
-    material = StockItem.query.get(material_id)
-    if not material:
-        return jsonify({'status': 'error', 'message': 'Material no encontrado'}), 400
+    item = StockItem.query.get(material_id)
+    if not item:
+        return jsonify({'status': 'error', 'message': 'No encontrado'}), 404
 
-    # Restamos la cantidad y agregamos la baja
-    material.quantity -= quantity
+    if item.quantity < cantidad:
+        return jsonify({'status': 'error', 'message': 'Cantidad insuficiente'}), 400
+
+    item.quantity -= cantidad
     db.session.commit()
 
-    baja = StockItem(
-        material_description=f"Baja - {material.material_description}",
-        part_number=material.part_number,
-        hazards_identified=material.hazards_identified,
+    baja = StockBaja(
+        stock_id=item.id,
+        employee_id=employee_id,
         date=datetime.now().strftime('%Y-%m-%d'),
-        quantity=-quantity,
-        after_open=material.after_open,
-        expiration_date=material.expiration_date,
-        due_date_match=material.due_date_match,
-        batch_number=material.batch_number,
+        quantity=cantidad,
         comments=f"Baja realizada por el empleado {employee_id}"
     )
     db.session.add(baja)
@@ -169,68 +180,24 @@ def registrar_baja():
 
     return jsonify({'status': 'success'})
 
-
-# Rutas para otros refrigeradores y racks
 @app.route('/refrigerador_2')
 def refrigerador_2():
     return "Vista para Refrigerador 2"
 
-@app.route('/Camara_frigorifica')
-def camara_frigorifica():
-    return "Vista para Cámara Frigorífica"
+@app.route('/get_bajas')
+def get_bajas():
+    bajas = StockBaja.query.all()
+    return jsonify([{
+        'id': b.id,
+        'stock_id': b.stock_id,
+        'employee_id': b.employee_id,
+        'date': b.date,
+        'quantity': b.quantity,
+        'comments': b.comments
+    } for b in bajas])
 
-@app.route('/Rack_1')
-def rack_1():  # Cambié el nombre de la función aquí
-    return "Vista para Rack 1"
-
-@app.route('/Rack_2')
-def rack_2():  # Cambié el nombre de la función aquí
-    return "Vista para Rack 2"
-
-@app.route('/Rack_3')
-def rack_3():  # Cambié el nombre de la función aquí
-    return "Vista para Rack 3"
-
-@app.route('/Rack_4')
-def rack_4():  # Cambié el nombre de la función aquí
-    return "Vista para Rack 4"
-
-@app.route('/Gaveta_1')
-def gaveta_1():  # Cambié el nombre de la función aquí
-    return "Vista para Gaveta 1"
-
-@app.route('/Gaveta_2')
-def gaveta_2():  # Cambié el nombre de la función aquí
-    return "Vista para Gaveta 2"
-
-@app.route('/Gaveta_3')
-def gaveta_3():  # Cambié el nombre de la función aquí
-    return "Vista para Gaveta 3"
-
-@app.route('/Coordinación_de_Insumos')
-def coordinacion_insumos():  # Cambié el nombre de la función aquí
-    return "Vista para Coordinación de Insumos"
-
-@app.route('/get_material_info/<int:id>', methods=['GET'])
-def get_material_info(id):
-    # Consultamos el material en la base de datos por su ID
-    material = StockItem.query.get(id)
-
-    if material:
-        # Retornamos la información del material como un JSON
-        return jsonify({
-            'material_description': material.material_description,
-            'part_number': material.part_number,
-            'due_date_match': material.due_date_match,
-            'batch_number': material.batch_number
-        })
-    else:
-        # Si el material no se encuentra, retornamos un mensaje de error
-        return jsonify(None), 404
-
-# Inicio de la aplicación
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()  # Crea todas las tablas en la base de datos
+        db.create_all()
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
