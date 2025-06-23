@@ -7,18 +7,19 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
-# Configuración de la base de datos
+# Configuración de la base de datos (PostgreSQL si está en env, SQLite local si no)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or 'sqlite:///components.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Carpeta para subir datasheets
+# Carpeta para subir datasheets PDFs
 UPLOAD_FOLDER = 'static/datasheets'
 ALLOWED_EXTENSIONS = {'pdf'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 db = SQLAlchemy(app)
 
-# Modelo de componente
+# Modelos
+
 class Component(db.Model):
     __tablename__ = 'components'
     id = db.Column(db.Integer, primary_key=True)
@@ -36,11 +37,27 @@ class Component(db.Model):
     output_destination = db.Column(db.String)
     output_date = db.Column(db.String)
 
-# Función para validar archivos
+class StockItem(db.Model):
+    __tablename__ = 'stock_items'
+    id = db.Column(db.Integer, primary_key=True)
+    material_description = db.Column(db.String, nullable=False)
+    part_number = db.Column(db.String)
+    hazards_identified = db.Column(db.String)
+    date = db.Column(db.String)  # ISO 'YYYY-MM-DD'
+    quantity = db.Column(db.Integer, default=0)
+    after_open = db.Column(db.String)
+    expiration_date = db.Column(db.String)
+    due_date_match = db.Column(db.String)
+    batch_number = db.Column(db.String)
+    comments = db.Column(db.String)
+
+# Funciones
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Rutas
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -59,17 +76,20 @@ def insumos():
 
 @app.route('/refrigerador_1')
 def refrigerador_1():
+    # Lista fija para demo, ideal cargar de DB si quieres
     resinas = [
         {"material": "Epoxy Adhesive", "part_number": "EA9390", "base": 100, "hardener": 56},
-        {"material": "epoxy paste adhesive", "part_number": "EA9396", "base": 100, "hardener": 30},
+        {"material": "Epoxy Paste Adhesive", "part_number": "EA9396", "base": 100, "hardener": 30},
         {"material": "Epoxy Type of Product Structural Adhesive", "part_number": "EY3804", "base": 100, "hardener": 66},
-        {"material": "epoxy paste", "part_number": "EA9394", "base": 100, "hardener": 17},
-        {"material": "thixotropic paste adhesive", "part_number": "EA934", "base": 100, "hardener": 33},
-        {"material": "thixotropic paste adhesive", "part_number": "52A", "base": 100, "hardener": 41},
+        {"material": "Epoxy Paste", "part_number": "EA9394", "base": 100, "hardener": 17},
+        {"material": "Thixotropic Paste Adhesive", "part_number": "EA934", "base": 100, "hardener": 33},
+        {"material": "Thixotropic Paste Adhesive", "part_number": "52A", "base": 100, "hardener": 41},
         {"material": "Epoxy Paste Adhesive", "part_number": "EA956", "base": 100, "hardener": 58},
         {"material": "Epoxy Paste Adhesive", "part_number": "EA9309.3NA", "base": 100, "hardener": 22}
     ]
-    return render_template('refrigerador_1.html', resinas=resinas)
+    # Traer stock para mostrar
+    stock_items = StockItem.query.all()
+    return render_template('refrigerador_1.html', resinas=resinas, stock_items=stock_items)
 
 @app.route('/upload_datasheet/<part_number>', methods=['GET', 'POST'])
 def upload_datasheet(part_number):
@@ -80,28 +100,48 @@ def upload_datasheet(part_number):
         if file.filename == '':
             return "Nombre de archivo vacío"
         if file and allowed_file(file.filename):
-            # Asegurar que la carpeta existe
             os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-
             filename = secure_filename(f"{part_number}.pdf")
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             return redirect(url_for('refrigerador_1'))
     return render_template('upload_pdf.html', part_number=part_number)
 
-class StockItem(db.Model):
-    __tablename__ = 'stock_items'
-    id = db.Column(db.Integer, primary_key=True)
-    material_description = db.Column(db.String, nullable=False)
-    part_number = db.Column(db.String)
-    hazards_identified = db.Column(db.String)
-    date = db.Column(db.String)  # Ideal ISO format 'YYYY-MM-DD'
-    quantity = db.Column(db.Integer, default=0)
-    after_open = db.Column(db.String)
-    expiration_date = db.Column(db.String)
-    due_date_match = db.Column(db.String)
-    batch_number = db.Column(db.String)
-    comments = db.Column(db.String)
+@app.route('/existencias_stock', methods=['GET'])
+def existencias_stock():
+    materiales = StockItem.query.all()
+    return render_template('existencias_stock.html', materiales=materiales)
 
+@app.route('/update_stock_field', methods=['POST'])
+def update_stock_field():
+    data = request.json
+    stock_id = data.get('id')
+    field = data.get('field')
+    value = data.get('value')
+
+    item = StockItem.query.get(stock_id)
+    if not item or field not in StockItem.__table__.columns.keys():
+        return jsonify({'status': 'error', 'message': 'Elemento o campo inválido'}), 400
+
+    setattr(item, field, value)
+    db.session.commit()
+    return jsonify({'status': 'success'})
+
+@app.route('/update_component_field', methods=['POST'])
+def update_component_field():
+    data = request.json
+    comp_id = data.get('id')
+    field = data.get('field')
+    value = data.get('value')
+
+    component = Component.query.get(comp_id)
+    if not component or field not in Component.__table__.columns.keys():
+        return jsonify({'status': 'error', 'message': 'Elemento o campo inválido'}), 400
+
+    setattr(component, field, value)
+    db.session.commit()
+    return jsonify({'status': 'success'})
+
+# Rutas ejemplo para otras zonas de insumos (puedes completar o cambiar)
 @app.route('/refrigerador_2')
 def refrigerador_2():
     return "Vista para Refrigerador 2"
@@ -142,6 +182,7 @@ def gaveta_3():
 def coordinacion_insumos():
     return "Vista para Coordinación de Insumos"
 
+# Registro de componentes entrada
 @app.route('/register_in', methods=['GET', 'POST'])
 def register_in():
     if request.method == 'POST':
@@ -164,6 +205,7 @@ def register_in():
         return redirect('/inventory')
     return render_template('register_in.html')
 
+# Inventario filtrado y listado de componentes no salidos
 @app.route('/inventory', methods=['GET'])
 def inventory():
     selected_aircraft = request.args.get('aircraft_registration')
@@ -195,6 +237,7 @@ def inventory():
 
     return render_template('inventory.html', components=components, aircrafts=aircrafts, selected_aircraft=selected_aircraft)
 
+# Registro de salida componente
 @app.route('/register_out/<int:id>', methods=['POST'])
 def register_out(id):
     component = Component.query.get(id)
@@ -206,6 +249,7 @@ def register_out(id):
         db.session.commit()
     return redirect(url_for('inventory'))
 
+# Historial de salidas
 @app.route('/historial_salidas')
 def historial_salidas():
     search = request.args.get('search')
@@ -219,6 +263,7 @@ def historial_salidas():
     salidas = query.order_by(Component.output_date.desc()).all()
     return render_template('historial_salidas.html', salidas=salidas)
 
+# Gráfica entradas/salidas por matrícula
 @app.route('/chart')
 def chart():
     return render_template('chart.html')
@@ -228,12 +273,8 @@ def chart_data():
     data = (
         db.session.query(
             Component.aircraft_registration,
-            func.count(case(
-                ((Component.output_date == '') | (Component.output_date == None), 1)
-            )).label('entradas'),
-            func.count(case(
-                ((Component.output_date != '') & (Component.output_date != None), 1)
-            )).label('salidas')
+            func.count(case(((Component.output_date == '') | (Component.output_date == None), 1))).label('entradas'),
+            func.count(case(((Component.output_date != '') & (Component.output_date != None), 1))).label('salidas')
         )
         .filter(Component.aircraft_registration.isnot(None))
         .filter(Component.aircraft_registration != '')
