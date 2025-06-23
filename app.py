@@ -174,6 +174,11 @@ def registrar_baja():
 def refrigerador_2():
     return "Vista para Refrigerador 2"
 
+@app.route('/camara_frigorifica')
+def camara_frigorifica():
+    return "Vista para Cámara Frigorífica"
+
+
 # Inicio de la aplicación
 if __name__ == '__main__':
     with app.app_context():
