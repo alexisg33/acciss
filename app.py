@@ -178,6 +178,37 @@ def refrigerador_2():
 def camara_frigorifica():
     return "Vista para Cámara Frigorífica"
 
+@app.route('/Rack_1')
+def camara_frigorifica():
+    return "Vista para Cámara Rack 1"
+
+@app.route('/Rack_2')
+def camara_frigorifica():
+    return "Vista para Cámara Rack 2"
+
+@app.route('/Rack_3')
+def camara_frigorifica():
+    return "Vista para Cámara Rack 3"
+
+@app.route('/Rack_4')
+def camara_frigorifica():
+    return "Vista para Cámara Rack 4"
+
+@app.route('/Gaveta_1')
+def camara_frigorifica():
+    return "Vista para Gaveta 1"
+
+@app.route('/Gaveta_2')
+def camara_frigorifica():
+    return "Vista para Gaveta 2"
+
+@app.route('/Gaveta_3')
+def camara_frigorifica():
+    return "Vista para Gaveta 3"
+
+@app.route('/Coordinación_de_Insumos')
+def camara_frigorifica():
+    return "Coordinación de Insumos"
 
 # Inicio de la aplicación
 if __name__ == '__main__':
