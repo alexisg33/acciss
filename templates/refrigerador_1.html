@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8">
     <title>Refrigerador 1 - A.C.C.I.S.S.</title>
     <style>
         body {
@@ -60,25 +60,9 @@
         }
         input {
             width: 100%;
-            box-sizing: border-box;
-            border: none;
-            background-color: transparent;
-            text-align: center;
-        }
-        input:focus {
-            background-color: #e8f0fe;
-            outline: none;
-        }
-        button.save-btn {
-            padding: 5px 10px;
-            background-color: #2196F3;
-            color: white;
-            border: none;
+            padding: 4px;
+            border: 1px solid #ccc;
             border-radius: 4px;
-            cursor: pointer;
-        }
-        button.save-btn:hover {
-            background-color: #0b7dda;
         }
     </style>
 </head>
@@ -129,38 +113,67 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Descripción</th>
+                <th>Material Description</th>
                 <th>Part Number</th>
-                <th>GHS</th>
-                <th>Fecha</th>
-                <th>Cantidad</th>
-                <th>Después de abrir</th>
-                <th>Fecha de Expiración</th>
-                <th>Coincide con Etiqueta</th>
-                <th>Número de Lote</th>
-                <th>Comentarios</th>
-                <th>Guardar</th>
+                <th>Hazards Identified (GHS)</th>
+                <th>Date</th>
+                <th>Quantity</th>
+                <th>After Open</th>
+                <th>Expiration Date</th>
+                <th>Due Date Match With Material Tag</th>
+                <th>Batch Number</th>
+                <th>Comments</th>
             </tr>
         </thead>
         <tbody>
             {% for item in stock_items %}
-            <tr data-id="{{ item.id }}">
+            <tr>
                 <td>{{ item.id }}</td>
-                <td><input type="text" value="{{ item.material_description }}"></td>
-                <td><input type="text" value="{{ item.part_number }}"></td>
-                <td><input type="text" value="{{ item.hazards_identified }}"></td>
-                <td><input type="date" value="{{ item.date }}"></td>
-                <td><input type="number" min="0" value="{{ item.quantity }}"></td>
-                <td><input type="text" value="{{ item.after_open }}"></td>
-                <td><input type="date" value="{{ item.expiration_date }}"></td>
-                <td><input type="text" value="{{ item.due_date_match }}"></td>
-                <td><input type="text" value="{{ item.batch_number }}"></td>
-                <td><input type="text" value="{{ item.comments }}"></td>
-                <td><button class="save-btn" onclick="saveRow(this)">Guardar</button></td>
+                <td><input type="text" value="{{ item.material_description }}" onblur="updateStockField({{ item.id }}, 'material_description', this.value)"></td>
+                <td><input type="text" value="{{ item.part_number }}" onblur="updateStockField({{ item.id }}, 'part_number', this.value)"></td>
+                <td><input type="text" value="{{ item.hazards_identified }}" onblur="updateStockField({{ item.id }}, 'hazards_identified', this.value)"></td>
+                <td>{{ item.date }}</td>
+                <td><input type="number" value="{{ item.quantity }}" onblur="updateStockField({{ item.id }}, 'quantity', this.value)"></td>
+                <td><input type="text" value="{{ item.after_open }}" onblur="updateStockField({{ item.id }}, 'after_open', this.value)"></td>
+                <td><input type="date" value="{{ item.expiration_date }}" onblur="updateStockField({{ item.id }}, 'expiration_date', this.value)"></td>
+                <td><input type="text" value="{{ item.due_date_match }}" onblur="updateStockField({{ item.id }}, 'due_date_match', this.value)"></td>
+                <td><input type="text" value="{{ item.batch_number }}" onblur="updateStockField({{ item.id }}, 'batch_number', this.value)"></td>
+                <td><input type="text" value="{{ item.comments }}" onblur="updateStockField({{ item.id }}, 'comments', this.value)"></td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+
+    <div style="text-align: center; margin-top: 30px;">
+        <button class="menu-button" onclick="toggleForm('resina-form')">Registrar resina</button>
+        <button class="menu-button" onclick="toggleForm('baja-form')">Registrar baja</button>
+    </div>
+
+    <div id="resina-form" style="display:none; margin-top: 20px;">
+        <h4>Registrar Resina</h4>
+        <form onsubmit="return enviarResina(event)">
+            <input type="text" name="material_description" placeholder="Descripción del material" required>
+            <input type="text" name="part_number" placeholder="Part Number" required>
+            <input type="text" name="hazards_identified" placeholder="GHS" required>
+            <input type="number" name="quantity" placeholder="Cantidad" required>
+            <input type="text" name="after_open" placeholder="Después de abrir">
+            <input type="date" name="expiration_date" required>
+            <input type="text" name="comments" placeholder="Comentarios">
+            <br><br>
+            <button class="menu-button" type="submit">Aceptar</button>
+        </form>
+    </div>
+
+    <div id="baja-form" style="display:none; margin-top: 20px;">
+        <h4>Registrar Baja</h4>
+        <form onsubmit="return enviarBaja(event)">
+            <input type="text" name="due_date_match" placeholder="Coincide con etiqueta">
+            <input type="text" name="batch_number" placeholder="Número de lote">
+            <input type="text" name="comments" placeholder="Comentarios">
+            <br><br>
+            <button class="menu-button" type="submit">Aceptar</button>
+        </form>
+    </div>
 </div>
 
 <div id="consumo" class="content-section">
@@ -169,52 +182,72 @@
 </div>
 
 <script>
-    function toggleSection(id) {
-        document.querySelectorAll('.content-section').forEach(section => {
-            if (section.id === id) {
-                section.classList.toggle('active');
-            } else {
-                section.classList.remove('active');
-            }
+function toggleSection(id) {
+    document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.remove('active');
+    });
+    document.getElementById(id).classList.add('active');
+}
+
+function toggleForm(id) {
+    const el = document.getElementById(id);
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+async function updateStockField(id, field, value) {
+    try {
+        const response = await fetch('/update_stock_field', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({id, field, value})
         });
-    }
-
-    async function saveRow(button) {
-        const row = button.closest('tr');
-        const id = row.getAttribute('data-id');
-        const inputs = row.querySelectorAll('input');
-
-        const data = {
-            id: id,
-            material_description: inputs[0].value.trim(),
-            part_number: inputs[1].value.trim(),
-            hazards_identified: inputs[2].value.trim(),
-            date: inputs[3].value,
-            quantity: inputs[4].value,
-            after_open: inputs[5].value.trim(),
-            expiration_date: inputs[6].value,
-            due_date_match: inputs[7].value.trim(),
-            batch_number: inputs[8].value.trim(),
-            comments: inputs[9].value.trim(),
-        };
-
-        try {
-            const response = await fetch('/update_stock_field', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
-            });
-            const result = await response.json();
-            if(result.status === 'success'){
-                alert('Registro guardado correctamente');
-            } else {
-                alert('Error al guardar: ' + (result.message || 'Error desconocido'));
-            }
-        } catch(err) {
-            alert('Error en la conexión');
-            console.error(err);
+        const result = await response.json();
+        if (result.status !== 'success') {
+            alert('Error al guardar: ' + result.message);
         }
+    } catch (err) {
+        alert('Error en conexión para guardar cambios');
+        console.error(err);
     }
+}
+
+async function enviarResina(event) {
+    event.preventDefault();
+    const form = event.target;
+    const datos = Object.fromEntries(new FormData(form));
+    const response = await fetch('/registrar_resina', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(datos)
+    });
+    const result = await response.json();
+    if (result.status === 'success') {
+        alert('Resina registrada');
+        form.reset();
+        location.reload();
+    } else {
+        alert('Error al registrar');
+    }
+}
+
+async function enviarBaja(event) {
+    event.preventDefault();
+    const form = event.target;
+    const datos = Object.fromEntries(new FormData(form));
+    const response = await fetch('/registrar_baja', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(datos)
+    });
+    const result = await response.json();
+    if (result.status === 'success') {
+        alert('Baja registrada');
+        form.reset();
+        location.reload();
+    } else {
+        alert('Error al registrar');
+    }
+}
 </script>
 
 </body>
