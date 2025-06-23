@@ -181,7 +181,8 @@ def camara_frigorifica():
 @app.route('/Rack_1')
 def camara_frigorifica():
     return "Vista para Cámara Rack 1"
-# Rutas para otros refrigeradores
+
+# Rutas para otros refrigeradores y racks
 @app.route('/refrigerador_2')
 def refrigerador_2():
     return "Vista para Refrigerador 2"
@@ -191,36 +192,37 @@ def camara_frigorifica():
     return "Vista para Cámara Frigorífica"
 
 @app.route('/Rack_1')
-def rack_1():
+def rack_1():  # Cambié el nombre de la función aquí
     return "Vista para Rack 1"
 
 @app.route('/Rack_2')
-def rack_2():
+def rack_2():  # Cambié el nombre de la función aquí
     return "Vista para Rack 2"
 
 @app.route('/Rack_3')
-def rack_3():
+def rack_3():  # Cambié el nombre de la función aquí
     return "Vista para Rack 3"
 
 @app.route('/Rack_4')
-def rack_4():
+def rack_4():  # Cambié el nombre de la función aquí
     return "Vista para Rack 4"
 
 @app.route('/Gaveta_1')
-def gaveta_1():
+def gaveta_1():  # Cambié el nombre de la función aquí
     return "Vista para Gaveta 1"
 
 @app.route('/Gaveta_2')
-def gaveta_2():
+def gaveta_2():  # Cambié el nombre de la función aquí
     return "Vista para Gaveta 2"
 
 @app.route('/Gaveta_3')
-def gaveta_3():
+def gaveta_3():  # Cambié el nombre de la función aquí
     return "Vista para Gaveta 3"
 
 @app.route('/Coordinación_de_Insumos')
-def coordinacion_insumos():
+def coordinacion_insumos():  # Cambié el nombre de la función aquí
     return "Vista para Coordinación de Insumos"
+
 
 # Inicio de la aplicación
 if __name__ == '__main__':
