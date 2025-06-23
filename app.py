@@ -87,6 +87,10 @@ def refrigerador_1():
     stock_items = StockItem.query.all()
     return render_template('refrigerador_1.html', resinas=resinas, stock_items=stock_items)
 
+@app.route('/refrigerador_2')
+def refrigerador_2():
+    return "Vista para Refrigerador 2 (en construcción)"
+
 @app.route('/upload_datasheet/<part_number>', methods=['GET', 'POST'])
 def upload_datasheet(part_number):
     if request.method == 'POST':
