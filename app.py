@@ -180,10 +180,6 @@ def registrar_baja():
 
     return jsonify({'status': 'success'})
 
-@app.route('/refrigerador_2')
-def refrigerador_2():
-    return "Vista para Refrigerador 2"
-
 @app.route('/get_bajas')
 def get_bajas():
     bajas = StockBaja.query.all()
@@ -195,6 +191,47 @@ def get_bajas():
         'quantity': b.quantity,
         'comments': b.comments
     } for b in bajas])
+
+@app.route('/refrigerador_2')
+def refrigerador_2():
+    return render_template('refrigerador_2.html')
+
+
+@app.route('/rack_1')
+def rack_1():
+    return render_template('rack_1.html')
+
+@app.route('/rack_2')
+def rack_2():
+    return render_template('rack_2.html')
+
+@app.route('/rack_3')
+def rack_3():
+    return render_template('rack_3.html')
+
+@app.route('/rack_4')
+def rack_4():
+    return render_template('rack_4.html')
+
+@app.route('/gaveta_1')
+def gaveta_1():
+    return render_template('gaveta_1.html')
+
+@app.route('/gaveta_2')
+def gaveta_2():
+    return render_template('gaveta_2.html')
+
+@app.route('/gaveta_3')
+def gaveta_3():
+    return render_template('gaveta_3.html')
+
+@app.route('/coordinacion_insumos')
+def coordinacion_insumos():
+    return render_template('coordinacion_insumos.html')
+
+@app.route('/camara_frigorifica')
+def camara_frigorifica():
+    return render_template('camara_frigorifica.html')
 
 if __name__ == '__main__':
     with app.app_context():
