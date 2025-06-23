@@ -169,25 +169,13 @@ def registrar_baja():
 
     return jsonify({'status': 'success'})
 
-# Rutas para otros refrigeradores
-@app.route('/refrigerador_2')
-def refrigerador_2():
-    return "Vista para Refrigerador 2"
-
-@app.route('/camara_frigorifica')
-def camara_frigorifica():
-    return "Vista para Cámara Frigorífica"
-
-@app.route('/Rack_1')
-def camara_frigorifica():
-    return "Vista para Cámara Rack 1"
 
 # Rutas para otros refrigeradores y racks
 @app.route('/refrigerador_2')
 def refrigerador_2():
     return "Vista para Refrigerador 2"
 
-@app.route('/camara_frigorifica')
+@app.route('/Camara_frigorifica')
 def camara_frigorifica():
     return "Vista para Cámara Frigorífica"
 
