@@ -129,16 +129,16 @@
             {% for item in stock_items %}
             <tr>
                 <td>{{ item.id }}</td>
-                <td><input type="text" value="{{ item.material_description }}" onblur="updateStockField({{ item.id }}, 'material_description', this.value)"></td>
-                <td><input type="text" value="{{ item.part_number }}" onblur="updateStockField({{ item.id }}, 'part_number', this.value)"></td>
-                <td><input type="text" value="{{ item.hazards_identified }}" onblur="updateStockField({{ item.id }}, 'hazards_identified', this.value)"></td>
+                <td>{{ item.material_description }}</td>
+                <td>{{ item.part_number }}</td>
+                <td>{{ item.hazards_identified }}</td>
                 <td>{{ item.date }}</td>
-                <td><input type="number" value="{{ item.quantity }}" onblur="updateStockField({{ item.id }}, 'quantity', this.value)"></td>
-                <td><input type="text" value="{{ item.after_open }}" onblur="updateStockField({{ item.id }}, 'after_open', this.value)"></td>
-                <td><input type="date" value="{{ item.expiration_date }}" onblur="updateStockField({{ item.id }}, 'expiration_date', this.value)"></td>
-                <td><input type="text" value="{{ item.due_date_match }}" onblur="updateStockField({{ item.id }}, 'due_date_match', this.value)"></td>
-                <td><input type="text" value="{{ item.batch_number }}" onblur="updateStockField({{ item.id }}, 'batch_number', this.value)"></td>
-                <td><input type="text" value="{{ item.comments }}" onblur="updateStockField({{ item.id }}, 'comments', this.value)"></td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.after_open }}</td>
+                <td>{{ item.expiration_date }}</td>
+                <td>{{ item.due_date_match }}</td>
+                <td>{{ item.batch_number }}</td>
+                <td>{{ item.comments }}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -166,30 +166,23 @@
         </form>
     </div>
 
-   <div id="baja-form" style="display:none; margin-top: 20px;">
-    <h4>Registrar Baja</h4>
-    <form onsubmit="return enviarBaja(event)">
-        <!-- Campo para ingresar ID del material -->
-        <input type="number" name="id" placeholder="ID del material" required>
-        
-        <!-- Campo para ingresar el número de empleado -->
-        <input type="number" name="employee_id" placeholder="Número de empleado" required>
-
-        <!-- Campo para ingresar la cantidad a dar de baja -->
-        <input type="number" name="quantity" placeholder="Cantidad a dar de baja" required>
-
-        <!-- Otros campos (opcional) -->
-        <input type="text" name="material_description" placeholder="Descripción del material">
-        <input type="text" name="part_number" placeholder="Part Number">
-        <input type="text" name="due_date_match" placeholder="Coincide con etiqueta">
-        <input type="text" name="batch_number" placeholder="Número de lote">
-        <input type="text" name="comments" placeholder="Comentarios">
-        
-        <br><br>
-        <button class="menu-button" type="submit">Aceptar</button>
-    </form>
+    <div id="baja-form" style="display:none; margin-top: 20px;">
+        <h4>Registrar Baja</h4>
+        <form onsubmit="return enviarBaja(event)">
+            <input type="number" name="id" placeholder="ID del material" required onchange="cargarMaterial(this.value)">
+            <input type="number" name="employee_id" placeholder="Número de empleado" required>
+            <input type="number" name="quantity" placeholder="Cantidad a dar de baja" required>
+            <br><br>
+            <input type="text" name="material_description" placeholder="Descripción del material" readonly>
+            <input type="text" name="part_number" placeholder="Part Number" readonly>
+            <input type="text" name="due_date_match" placeholder="Coincide con etiqueta" readonly>
+            <input type="text" name="batch_number" placeholder="Número de lote" readonly>
+            <input type="text" name="comments" placeholder="Comentarios" readonly>
+            <br><br>
+            <button class="menu-button" type="submit">Aceptar</button>
+        </form>
+    </div>
 </div>
-
 
 <div id="consumo" class="content-section">
     <h3>Registro de Consumo</h3>
@@ -223,6 +216,20 @@ async function updateStockField(id, field, value) {
     } catch (err) {
         alert('Error en conexión para guardar cambios');
         console.error(err);
+    }
+}
+
+async function cargarMaterial(id) {
+    const response = await fetch('/get_material_info/' + id);
+    const material = await response.json();
+
+    if (material) {
+        document.querySelector('[name="material_description"]').value = material.material_description;
+        document.querySelector('[name="part_number"]').value = material.part_number;
+        document.querySelector('[name="due_date_match"]').value = material.due_date_match;
+        document.querySelector('[name="batch_number"]').value = material.batch_number;
+    } else {
+        alert('Material no encontrado');
     }
 }
 

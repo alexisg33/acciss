@@ -211,6 +211,22 @@ def gaveta_3():  # Cambié el nombre de la función aquí
 def coordinacion_insumos():  # Cambié el nombre de la función aquí
     return "Vista para Coordinación de Insumos"
 
+@app.route('/get_material_info/<int:id>', methods=['GET'])
+def get_material_info(id):
+    # Consultamos el material en la base de datos por su ID
+    material = StockItem.query.get(id)
+
+    if material:
+        # Retornamos la información del material como un JSON
+        return jsonify({
+            'material_description': material.material_description,
+            'part_number': material.part_number,
+            'due_date_match': material.due_date_match,
+            'batch_number': material.batch_number
+        })
+    else:
+        # Si el material no se encuentra, retornamos un mensaje de error
+        return jsonify(None), 404
 
 # Inicio de la aplicación
 if __name__ == '__main__':
