@@ -73,8 +73,19 @@
 <div class="button-group">
     <button class="menu-button" onclick="toggleSection('info')">Información de Insumos</button>
     <button class="menu-button" onclick="toggleSection('stock')">Existencias / Stock</button>
+    <button class="menu-button" onclick="location.href='{{ url_for('refrigerador_2') }}'">Refrigerador 2</button>
+    <button class="menu-button" onclick="location.href='{{ url_for('camara_frigorifica') }}'">Cámara Frigorífica</button>
+    <button class="menu-button" onclick="location.href='{{ url_for('rack_1') }}'">Rack 1</button>
+    <button class="menu-button" onclick="location.href='{{ url_for('rack_2') }}'">Rack 2</button>
+    <button class="menu-button" onclick="location.href='{{ url_for('rack_3') }}'">Rack 3</button>
+    <button class="menu-button" onclick="location.href='{{ url_for('rack_4') }}'">Rack 4</button>
+    <button class="menu-button" onclick="location.href='{{ url_for('gaveta_1') }}'">Gaveta 1</button>
+    <button class="menu-button" onclick="location.href='{{ url_for('gaveta_2') }}'">Gaveta 2</button>
+    <button class="menu-button" onclick="location.href='{{ url_for('gaveta_3') }}'">Gaveta 3</button>
+    <button class="menu-button" onclick="location.href='{{ url_for('coordinacion_insumos') }}'">Coordinación de Insumos</button>
 </div>
 
+<!-- Información de insumos -->
 <div id="info" class="content-section active">
     <h3>Información de Insumos</h3>
     <table>
@@ -106,6 +117,7 @@
     </table>
 </div>
 
+<!-- Tabla de stock y formularios -->
 <div id="stock" class="content-section">
     <h3>Existencias / Stock</h3>
     <table>
@@ -144,7 +156,6 @@
     </table>
 
     <div style="text-align: center; margin-top: 30px;">
-        <button class="menu-button" onclick="toggleForm('resina-form')">Registrar resina</button>
         <button class="menu-button" onclick="toggleForm('baja-form')">Registrar baja</button>
     </div>
 
