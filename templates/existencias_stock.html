@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Existencias / Stock</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        button.save-btn {
+            padding: 5px 10px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button.save-btn:hover {
+            background-color: #0b7dda;
+        }
+        input, select {
+            width: 100%;
+            border: none;
+            background: transparent;
+            text-align: center;
+        }
+        input:focus {
+            background-color: #e8f0fe;
+        }
+    </style>
+</head>
+<body>
+    <h3>Existencias / Stock</h3>
+    <table id="stock-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Descripción</th>
+                <th>Part Number</th>
+                <th>Identificación GHS</th>
+                <th>Fecha de Entrada</th>
+                <th>Cantidad</th>
+                <th>Después de abrir</th>
+                <th>Fecha de Expiración</th>
+                <th>Coincide con etiqueta</th>
+                <th>Número de Lote</th>
+                <th>Fecha de Salida</th>
+                <th>Comentarios</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in stock %}
+            <tr data-id="{{ row.id }}">
+                <td>{{ row.id }}</td>
+                <td contenteditable>{{ row.material_description }}</td>
+                <td contenteditable>{{ row.part_number }}</td>
+                <td contenteditable>{{ row.ghs }}</td>
+                <td>{{ row.entry_date }}</td>
+                <td contenteditable>{{ row.quantity }}</td>
+                <td contenteditable>{{ row.after_open }}</td>
+                <td contenteditable>{{ row.expiration_date }}</td>
+                <td contenteditable>{{ row.date_match_tag }}</td>
+                <td contenteditable>{{ row.batch_number }}</td>
+                <td>{{ row.output_date or '' }}</td>
+                <td contenteditable>{{ row.comments }}</td>
+                <td><button class="save-btn" onclick="saveRow(this)">Guardar</button></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        function saveRow(btn) {
+            const row = btn.closest('tr');
+            const id = row.getAttribute('data-id');
+            const cells = row.querySelectorAll('td');
+
+            const data = {
+                id: id,
+                material_description: cells[1].innerText.trim(),
+                part_number: cells[2].innerText.trim(),
+                ghs: cells[3].innerText.trim(),
+                quantity: cells[5].innerText.trim(),
+                after_open: cells[6].innerText.trim(),
+                expiration_date: cells[7].innerText.trim(),
+                date_match_tag: cells[8].innerText.trim(),
+                batch_number: cells[9].innerText.trim(),
+                comments: cells[11].innerText.trim()
+            };
+
+            fetch('/update_stock', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            }).then(response => response.json())
+              .then(data => {
+                if (data.success) {
+                    alert('Guardado correctamente');
+                } else {
+                    alert('Error al guardar');
+                }
+              });
+        }
+    </script>
+</body>
+</html>
