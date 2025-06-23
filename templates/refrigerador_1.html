@@ -58,7 +58,7 @@
         tr:nth-child(even) {
             background-color: #f1f8e9;
         }
-        input {
+        input, select {
             width: 100%;
             padding: 4px;
             border: 1px solid #ccc;
@@ -73,7 +73,7 @@
 <div class="button-group">
     <button class="menu-button" onclick="toggleSection('info')">Información de Insumos</button>
     <button class="menu-button" onclick="toggleSection('stock')">Existencias / Stock</button>
-    <button class="menu-button" onclick="toggleSection('consumo')">Registrar Consumo</button>
+    <button class="menu-button" onclick="toggleSection('consumo')">Registrar consumo</button>
 </div>
 
 <div id="info" class="content-section active">
@@ -149,6 +149,29 @@
         <button class="menu-button" onclick="toggleForm('baja-form')">Registrar baja</button>
     </div>
 
+    <div id="resina-form" style="display:none; margin-top: 20px;">
+        <h4>Registrar Resina</h4>
+        <form onsubmit="return enviarResina(event)">
+            <input type="text" name="employee_id" placeholder="Número de empleado" required>
+            <select name="part_number" required onchange="autocompletarMaterial(this.value)">
+                <option value="">Selecciona Part Number</option>
+                {% for r in resinas %}
+                    <option value="{{ r.part_number }}">{{ r.part_number }}</option>
+                {% endfor %}
+            </select>
+            <input type="text" name="material_description" placeholder="Descripción del material" readonly>
+            <input type="text" name="hazards_identified" placeholder="Hazards Identified (GHS)">
+            <input type="number" name="quantity" placeholder="Cantidad" required>
+            <input type="text" name="after_open" placeholder="After Open">
+            <input type="date" name="expiration_date" placeholder="Expiration Date">
+            <input type="text" name="due_date_match" placeholder="Coincide con etiqueta">
+            <input type="text" name="batch_number" placeholder="Número de lote">
+            <input type="text" name="comments" placeholder="Comentarios">
+            <br><br>
+            <button class="menu-button" type="submit">Aceptar</button>
+        </form>
+    </div>
+
     <div id="baja-form" style="display:none; margin-top: 20px;">
         <h4>Registrar Baja</h4>
         <form onsubmit="return enviarBaja(event)">
@@ -163,29 +186,18 @@
             <button class="menu-button" type="submit">Aceptar</button>
         </form>
     </div>
-
-    <div id="resina-form" style="display:none; margin-top: 20px;">
-        <h4>Registrar Resina Nueva</h4>
-        <form>
-            <!-- Aquí van los inputs del formulario de resina -->
-            <!-- ... -->
-            <br><br>
-            <button class="menu-button" type="submit">Registrar</button>
-            <button class="menu-button" type="button">Registrar término</button>
-        </form>
-    </div>
 </div>
 
 <div id="consumo" class="content-section">
     <h3>Registrar Consumo</h3>
     <form>
-        <input type="number" name="id_consumo" placeholder="ID del material" required>
-        <input type="text" name="employee_id_consumo" placeholder="Número de empleado" required>
-        <input type="number" name="cantidad_consumida" placeholder="Cantidad consumida (g)" required>
-        <input type="text" name="material_description_consumo" placeholder="Descripción del material">
-        <input type="text" name="part_number_consumo" placeholder="Part Number">
-        <input type="text" name="due_date_match_consumo" placeholder="Coincide con etiqueta">
-        <input type="text" name="batch_number_consumo" placeholder="Número de lote">
+        <input type="number" placeholder="ID del material">
+        <input type="text" placeholder="Número de empleado">
+        <input type="number" placeholder="Cantidad consumida (g)">
+        <input type="text" placeholder="Descripción del material">
+        <input type="text" placeholder="Part Number">
+        <input type="text" placeholder="Coincide con etiqueta">
+        <input type="text" placeholder="Número de lote">
         <br><br>
         <button class="menu-button" type="submit">Aceptar</button>
     </form>
@@ -214,6 +226,33 @@ async function cargarMaterial(id) {
         document.querySelector('[name="batch_number"]').value = material.batch_number;
     } else {
         alert('Material no encontrado');
+    }
+}
+
+function autocompletarMaterial(partNumber) {
+    const resinas = {{ resinas|tojson }};
+    const selected = resinas.find(r => r.part_number === partNumber);
+    if (selected) {
+        document.querySelector('[name="material_description"]').value = selected.material;
+    }
+}
+
+async function enviarResina(event) {
+    event.preventDefault();
+    const form = event.target;
+    const datos = Object.fromEntries(new FormData(form));
+    const response = await fetch('/registrar_resina', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(datos)
+    });
+    const result = await response.json();
+    if (result.status === 'success') {
+        alert('Resina registrada');
+        form.reset();
+        location.reload();
+    } else {
+        alert('Error al registrar');
     }
 }
 
