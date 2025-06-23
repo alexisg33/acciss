@@ -1,4 +1,3 @@
-<!-- templates/refrigerador_1.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -13,6 +12,10 @@
         h2 {
             color: #2e7d32;
             text-align: center;
+        }
+        .button-group {
+            text-align: center;
+            margin-bottom: 30px;
         }
         .menu-button {
             background-color: #43a047;
@@ -29,8 +32,12 @@
             background-color: #2e7d32;
         }
         .content-section {
+            display: none;
             width: 95%;
             margin: 0 auto 40px auto;
+        }
+        .content-section.active {
+            display: block;
         }
         table {
             width: 100%;
@@ -51,7 +58,7 @@
         tr:nth-child(even) {
             background-color: #f1f8e9;
         }
-        input, select {
+        input {
             width: 100%;
             padding: 4px;
             border: 1px solid #ccc;
@@ -63,7 +70,44 @@
 
 <h2>Refrigerador 1 - Gestión de Insumos (±4°C)</h2>
 
-<div class="content-section">
+<div class="button-group">
+    <button class="menu-button" onclick="toggleSection('info')">Información de Insumos</button>
+    <button class="menu-button" onclick="toggleSection('stock')">Existencias / Stock</button>
+    <button class="menu-button" onclick="toggleSection('consumo')">Registro de Consumo</button>
+</div>
+
+<div id="info" class="content-section active">
+    <h3>Información de Insumos</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Material</th>
+                <th>Part Number</th>
+                <th>Base (A)</th>
+                <th>Hardener (B)</th>
+                <th>Datasheet</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in resinas %}
+            <tr>
+                <td>{{ r.material }}</td>
+                <td>{{ r.part_number }}</td>
+                <td>{{ r.base }}</td>
+                <td>{{ r.hardener }}</td>
+                <td>
+                    <a href="{{ url_for('upload_datasheet', part_number=r.part_number) }}" class="menu-button">Subir</a>
+                    {% if r.part_number %}
+                        <a href="{{ url_for('static', filename='datasheets/' ~ r.part_number ~ '.pdf') }}" class="menu-button" target="_blank">Ver</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div id="stock" class="content-section">
     <h3>Existencias / Stock</h3>
     <table>
         <thead>
@@ -76,7 +120,7 @@
                 <th>Quantity</th>
                 <th>After Open</th>
                 <th>Expiration Date</th>
-                <th>Due Date Match</th>
+                <th>Due Date Match With Material Tag</th>
                 <th>Batch Number</th>
                 <th>Comments</th>
             </tr>
@@ -85,16 +129,16 @@
             {% for item in stock_items %}
             <tr>
                 <td>{{ item.id }}</td>
-                <td>{{ item.material_description }}</td>
-                <td>{{ item.part_number }}</td>
-                <td>{{ item.hazards_identified }}</td>
+                <td><input type="text" value="{{ item.material_description }}" onblur="updateStockField({{ item.id }}, 'material_description', this.value)"></td>
+                <td><input type="text" value="{{ item.part_number }}" onblur="updateStockField({{ item.id }}, 'part_number', this.value)"></td>
+                <td><input type="text" value="{{ item.hazards_identified }}" onblur="updateStockField({{ item.id }}, 'hazards_identified', this.value)"></td>
                 <td>{{ item.date }}</td>
-                <td>{{ item.quantity }}</td>
-                <td>{{ item.after_open }}</td>
-                <td>{{ item.expiration_date }}</td>
-                <td>{{ item.due_date_match }}</td>
-                <td>{{ item.batch_number }}</td>
-                <td>{{ item.comments }}</td>
+                <td><input type="number" value="{{ item.quantity }}" onblur="updateStockField({{ item.id }}, 'quantity', this.value)"></td>
+                <td><input type="text" value="{{ item.after_open }}" onblur="updateStockField({{ item.id }}, 'after_open', this.value)"></td>
+                <td><input type="date" value="{{ item.expiration_date }}" onblur="updateStockField({{ item.id }}, 'expiration_date', this.value)"></td>
+                <td><input type="text" value="{{ item.due_date_match }}" onblur="updateStockField({{ item.id }}, 'due_date_match', this.value)"></td>
+                <td><input type="text" value="{{ item.batch_number }}" onblur="updateStockField({{ item.id }}, 'batch_number', this.value)"></td>
+                <td><input type="text" value="{{ item.comments }}" onblur="updateStockField({{ item.id }}, 'comments', this.value)"></td>
             </tr>
             {% endfor %}
         </tbody>
@@ -108,13 +152,8 @@
     <div id="resina-form" style="display:none; margin-top: 20px;">
         <h4>Registrar Resina</h4>
         <form onsubmit="return enviarResina(event)">
-            <select name="part_number" id="part_number_select" required onchange="cargarDescripcion()">
-                <option value="">Seleccionar Part Number</option>
-                {% for r in resinas %}
-                    <option value="{{ r.part_number }}" data-descripcion="{{ r.material }}">{{ r.part_number }}</option>
-                {% endfor %}
-            </select>
-            <input type="text" name="material_description" id="material_description_input" placeholder="Descripción del material" readonly required>
+            <input type="text" name="material_description" placeholder="Descripción del material" required>
+            <input type="text" name="part_number" placeholder="Part Number" required>
             <input type="text" name="hazards_identified" placeholder="GHS" required>
             <input type="number" name="quantity" placeholder="Cantidad" required>
             <input type="text" name="after_open" placeholder="Después de abrir">
@@ -127,30 +166,64 @@
         </form>
     </div>
 
-    <div id="baja-form" style="display:none; margin-top: 20px;">
-        <h4>Registrar Baja</h4>
-        <form onsubmit="return enviarBaja(event)">
-            <input type="text" name="due_date_match" placeholder="Coincide con etiqueta">
-            <input type="text" name="batch_number" placeholder="Número de lote">
-            <input type="text" name="comments" placeholder="Comentarios">
-            <br><br>
-            <button class="menu-button" type="submit">Aceptar</button>
-        </form>
-    </div>
+   <div id="baja-form" style="display:none; margin-top: 20px;">
+    <h4>Registrar Baja</h4>
+    <form onsubmit="return enviarBaja(event)">
+        <!-- Campo para ingresar ID del material -->
+        <input type="number" name="id" placeholder="ID del material" required>
+        
+        <!-- Campo para ingresar el número de empleado -->
+        <input type="number" name="employee_id" placeholder="Número de empleado" required>
+
+        <!-- Campo para ingresar la cantidad a dar de baja -->
+        <input type="number" name="quantity" placeholder="Cantidad a dar de baja" required>
+
+        <!-- Otros campos (opcional) -->
+        <input type="text" name="material_description" placeholder="Descripción del material">
+        <input type="text" name="part_number" placeholder="Part Number">
+        <input type="text" name="due_date_match" placeholder="Coincide con etiqueta">
+        <input type="text" name="batch_number" placeholder="Número de lote">
+        <input type="text" name="comments" placeholder="Comentarios">
+        
+        <br><br>
+        <button class="menu-button" type="submit">Aceptar</button>
+    </form>
+</div>
+
+
+<div id="consumo" class="content-section">
+    <h3>Registro de Consumo</h3>
+    <p>Funcionalidad pendiente de implementación.</p>
 </div>
 
 <script>
+function toggleSection(id) {
+    document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.remove('active');
+    });
+    document.getElementById(id).classList.add('active');
+}
+
 function toggleForm(id) {
     const el = document.getElementById(id);
     el.style.display = el.style.display === 'none' ? 'block' : 'none';
 }
 
-function cargarDescripcion() {
-    const select = document.getElementById('part_number_select');
-    const descripcion = select.options[select.selectedIndex].getAttribute('data-descripcion');
-    const inputDesc = document.getElementById('material_description_input');
-    inputDesc.value = descripcion;
-    if (descripcion) inputDesc.style.border = '2px solid green';
+async function updateStockField(id, field, value) {
+    try {
+        const response = await fetch('/update_stock_field', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({id, field, value})
+        });
+        const result = await response.json();
+        if (result.status !== 'success') {
+            alert('Error al guardar: ' + result.message);
+        }
+    } catch (err) {
+        alert('Error en conexión para guardar cambios');
+        console.error(err);
+    }
 }
 
 async function enviarResina(event) {
