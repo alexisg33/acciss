@@ -73,7 +73,7 @@
 <div class="button-group">
     <button class="menu-button" onclick="toggleSection('info')">Información de Insumos</button>
     <button class="menu-button" onclick="toggleSection('stock')">Existencias / Stock</button>
-    <button class="menu-button" onclick="toggleSection('bajas')">Registrar Consumo</button>
+    <button class="menu-button" onclick="toggleSection('consumo')">Registrar Consumo</button>
 </div>
 
 <div id="info" class="content-section active">
@@ -143,11 +143,54 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <div style="text-align: center; margin-top: 30px;">
+        <button class="menu-button" onclick="toggleForm('resina-form')">Registrar entrada</button>
+        <button class="menu-button" onclick="toggleForm('baja-form')">Registrar salida</button>
+    </div>
+
+    <div id="resina-form" style="display:none; margin-top: 20px;">
+        <h4>Registrar Entrada</h4>
+        <form onsubmit="return enviarRegistro(event)">
+            <input type="text" name="employee_id" placeholder="Número de empleado" required>
+            <select name="part_number" onchange="rellenarDesdeInfo(this.value)" required>
+                <option value="">Seleccione Part Number</option>
+                {% for r in resinas %}
+                <option value="{{ r.part_number }}">{{ r.part_number }}</option>
+                {% endfor %}
+            </select>
+            <input type="text" name="material_description" placeholder="Descripción del material" readonly>
+            <input type="text" name="hazards_identified" placeholder="Peligros identificados (GHS)">
+            <input type="number" name="quantity" placeholder="Cantidad" required>
+            <input type="text" name="after_open" placeholder="Después de abrir">
+            <input type="date" name="expiration_date" placeholder="Fecha de caducidad">
+            <input type="text" name="due_date_match" placeholder="Coincide con etiqueta">
+            <input type="text" name="batch_number" placeholder="Número de lote">
+            <input type="text" name="comments" placeholder="Comentarios">
+            <br><br>
+            <button class="menu-button" type="submit">Aceptar</button>
+        </form>
+    </div>
+
+    <div id="baja-form" style="display:none; margin-top: 20px;">
+        <h4>Registrar Baja</h4>
+        <form onsubmit="return enviarBaja(event)">
+            <input type="number" name="id" placeholder="ID del material" required onchange="cargarMaterial(this.value)">
+            <input type="text" name="employee_id" placeholder="Número de empleado" required>
+            <input type="number" name="quantity" placeholder="Cantidad a dar de baja" required>
+            <input type="text" name="material_description" placeholder="Descripción del material" readonly>
+            <input type="text" name="part_number" placeholder="Part Number" readonly>
+            <input type="text" name="due_date_match" placeholder="Coincide con etiqueta" readonly>
+            <input type="text" name="batch_number" placeholder="Número de lote" readonly>
+            <br><br>
+            <button class="menu-button" type="submit">Aceptar</button>
+        </form>
+    </div>
 </div>
 
-<div id="bajas" class="content-section">
+<div id="consumo" class="content-section">
     <h3>Registrar Consumo</h3>
-    <form>
+    <form onsubmit="return enviarBaja(event)">
         <input type="number" name="id" placeholder="ID del material" required onchange="cargarMaterial(this.value)">
         <input type="text" name="employee_id" placeholder="Número de empleado" required>
         <input type="number" name="quantity" placeholder="Cantidad consumida (g)" required>
@@ -159,23 +202,27 @@
         <button class="menu-button" type="submit">Aceptar</button>
     </form>
 
-    <h3>Historial de Consumo</h3>
+    <h3 style="margin-top: 40px;">Historial de Consumo</h3>
     <table>
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Número de empleado</th>
+                <th>ID Baja</th>
+                <th>Stock ID</th>
+                <th>Empleado</th>
                 <th>Fecha</th>
                 <th>Cantidad</th>
+                <th>Comentarios</th>
             </tr>
         </thead>
         <tbody>
-            {% for b in bajas %}
+            {% for baja in bajas %}
             <tr>
-                <td>{{ b.stock_id }}</td>
-                <td>{{ b.employee_id }}</td>
-                <td>{{ b.date }}</td>
-                <td>{{ b.quantity }}</td>
+                <td>{{ baja.id }}</td>
+                <td>{{ baja.stock_id }}</td>
+                <td>{{ baja.employee_id }}</td>
+                <td>{{ baja.date }}</td>
+                <td>{{ baja.quantity }}</td>
+                <td>{{ baja.comments }}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -190,6 +237,11 @@ function toggleSection(id) {
     document.getElementById(id).classList.add('active');
 }
 
+function toggleForm(id) {
+    const el = document.getElementById(id);
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
 async function cargarMaterial(id) {
     const response = await fetch('/get_material_info/' + id);
     const material = await response.json();
@@ -200,6 +252,51 @@ async function cargarMaterial(id) {
         document.querySelector('[name="batch_number"]').value = material.batch_number;
     } else {
         alert('Material no encontrado');
+    }
+}
+
+function rellenarDesdeInfo(partNumber) {
+    const fila = [...document.querySelectorAll('#info table tbody tr')].find(tr => tr.children[1].textContent === partNumber);
+    if (fila) {
+        document.querySelector('[name="material_description"]').value = fila.children[0].textContent;
+    }
+}
+
+async function enviarBaja(event) {
+    event.preventDefault();
+    const form = event.target;
+    const datos = Object.fromEntries(new FormData(form));
+    const response = await fetch('/registrar_baja', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(datos)
+    });
+    const result = await response.json();
+    if (result.status === 'success') {
+        alert('Registro exitoso');
+        form.reset();
+        location.reload();
+    } else {
+        alert('Error: ' + result.message);
+    }
+}
+
+async function enviarRegistro(event) {
+    event.preventDefault();
+    const form = event.target;
+    const datos = Object.fromEntries(new FormData(form));
+    const response = await fetch('/registrar_resina', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(datos)
+    });
+    const result = await response.json();
+    if (result.status === 'success') {
+        alert('Entrada registrada');
+        form.reset();
+        location.reload();
+    } else {
+        alert('Error al registrar entrada');
     }
 }
 </script>
