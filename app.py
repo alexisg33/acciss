@@ -33,38 +33,13 @@ class Component(db.Model):
     output_technician = db.Column(db.String)
     output_destination = db.Column(db.String)
     output_date = db.Column(db.String)
-    
-    @app.route('/inventario', methods=['GET'])
-def inventory():
-    search = request.args.get('search', '')
-    selected_aircraft = request.args.get('aircraft_registration', '')
-
-    query = db.session.query(Componentes)
-
-    if selected_aircraft:
-        query = query.filter_by(aircraft_registration=selected_aircraft)
-
-    if search:
-        search_pattern = f"%{search}%"
-        query = query.filter(
-            (Componentes.part_number.ilike(search_pattern)) |
-            (Componentes.description.ilike(search_pattern)) |
-            (Componentes.serial_number.ilike(search_pattern))
-        )
-
-    components = query.order_by(Componentes.entry_date.desc()).all()
-
-    aircrafts = db.session.query(Componentes.aircraft_registration).distinct().all()
-    aircrafts = [a[0] for a in aircrafts if a[0]]  # Elimina registros None
-
-    return render_template('inventory.html', components=components, aircrafts=aircrafts, selected_aircraft=selected_aircraft)
 
 @app.route('/inventario', methods=['GET'])
 def inventory():
     search = request.args.get('search', '')
     selected_aircraft = request.args.get('aircraft_registration', '')
 
-    query = db.session.query(Componentes)
+    query = db.session.query(Component)
 
     if selected_aircraft:
         query = query.filter_by(aircraft_registration=selected_aircraft)
@@ -72,36 +47,18 @@ def inventory():
     if search:
         search_pattern = f"%{search}%"
         query = query.filter(
-            (Componentes.part_number.ilike(search_pattern)) |
-            (Componentes.description.ilike(search_pattern)) |
-            (Componentes.serial_number.ilike(search_pattern))
+            (Component.part_number.ilike(search_pattern)) |
+            (Component.description.ilike(search_pattern)) |
+            (Component.serial_number.ilike(search_pattern))
         )
 
-    components = query.order_by(Componentes.entry_date.desc()).all()
+    components = query.order_by(Component.entry_date.desc()).all()
 
-    aircrafts = db.session.query(Componentes.aircraft_registration).distinct().all()
+    aircrafts = db.session.query(Component.aircraft_registration).distinct().all()
     aircrafts = [a[0] for a in aircrafts if a[0]]  # Elimina registros None
 
     return render_template('inventory.html', components=components, aircrafts=aircrafts, selected_aircraft=selected_aircraft)
 
-@app.route('/register_in', methods=['GET', 'POST'])
-def register_in():
-    if request.method == 'POST':
-        nuevo = Component(
-            part_number=request.form['part_number'],
-            description=request.form['description'],
-            serial_number=request.form['serial_number'],
-            location=request.form['location'],
-            status=request.form['status'],
-            technician=request.form['technician'],
-            aircraft_registration=request.form['aircraft_registration'],
-            wo_number=request.form['wo_number'],
-            entry_date=datetime.now().strftime('%Y-%m-%d')
-        )
-        db.session.add(nuevo)
-        db.session.commit()
-        return redirect(url_for('componentes'))
-    return render_template('register_in.html')  # Asegúrate de tener este HTML
 
 
 class StockItem(db.Model):
