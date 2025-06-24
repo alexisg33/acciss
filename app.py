@@ -233,6 +233,64 @@ def coordinacion_insumos():
 def camara_frigorifica():
     return render_template('camara_frigorifica.html')
 
+class StockConsumo(db.Model):
+    __tablename__ = 'stock_consumos'
+    id = db.Column(db.Integer, primary_key=True)
+    stock_id = db.Column(db.Integer)
+    employee_id = db.Column(db.String)
+    date = db.Column(db.String)
+    quantity = db.Column(db.Integer)
+    comments = db.Column(db.String)
+
+@app.route('/registrar_consumo', methods=['POST'])
+def registrar_consumo():
+    data = request.json
+    material_id = int(data['id'])
+    cantidad = int(data['quantity'])
+    empleado = data['employee_id']
+
+    item = StockItem.query.get(material_id)
+    if not item:
+        return jsonify({'status': 'error', 'message': 'Material no encontrado'}), 404
+
+    if item.quantity < cantidad:
+        return jsonify({'status': 'error', 'message': 'Cantidad insuficiente'}), 400
+
+    item.quantity -= cantidad
+    db.session.commit()
+
+    consumo = StockConsumo(
+        stock_id=material_id,
+        employee_id=empleado,
+        quantity=cantidad,
+        date=datetime.now().strftime('%Y-%m-%d'),
+        comments=f"Consumo registrado por empleado {empleado}"
+    )
+    db.session.add(consumo)
+    db.session.commit()
+
+    return jsonify({'status': 'success'})
+
+
+@app.route('/register_in', methods=['GET', 'POST'])
+def register_in():
+    if request.method == 'POST':
+        nuevo = Component(
+            part_number=request.form['part_number'],
+            description=request.form['description'],
+            serial_number=request.form['serial_number'],
+            location=request.form['location'],
+            status=request.form['status'],
+            technician=request.form['technician'],
+            aircraft_registration=request.form['aircraft_registration'],
+            wo_number=request.form['wo_number'],
+            entry_date=datetime.now().strftime('%Y-%m-%d')
+        )
+        db.session.add(nuevo)
+        db.session.commit()
+        return redirect(url_for('componentes'))
+    return render_template('register_in.html')  # Asegúrate de tener este HTML
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
