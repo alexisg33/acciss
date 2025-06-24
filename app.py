@@ -34,6 +34,29 @@ class Component(db.Model):
     output_destination = db.Column(db.String)
     output_date = db.Column(db.String)
 
+@app.route('/register_in', methods=['GET', 'POST'], endpoint='register_in')
+def register_in():
+
+    if request.method == 'POST':
+        component = Component(
+            part_number=request.form['part_number'],
+            description=request.form['description'],
+            serial_number=request.form['serial_number'],
+            location=request.form['location'],
+            status=request.form['status'],
+            technician=request.form['technician'],
+            aircraft_registration=request.form['aircraft_registration'],
+            wo_number=request.form.get('wo_number') or '',
+            output_location='',
+            output_technician='',
+            output_destination='',
+            output_date=''
+        )
+        db.session.add(component)
+        db.session.commit()
+        return redirect('/inventory')
+    return render_template('register_in.html')
+
 @app.route('/inventario', methods=['GET'])
 def inventory():
     search = request.args.get('search', '')
