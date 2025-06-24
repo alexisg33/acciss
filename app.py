@@ -322,6 +322,10 @@ def registrar_consumo():
 
     return jsonify({'status': 'success'})
 
+@app.route('/chart')
+def chart():
+    return render_template('chart.html')
+
 
 if __name__ == '__main__':
     with app.app_context():
