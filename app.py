@@ -59,6 +59,31 @@ def inventory():
 
     return render_template('inventory.html', components=components, aircrafts=aircrafts, selected_aircraft=selected_aircraft)
 
+@app.route('/inventario', methods=['GET'])
+def inventory():
+    search = request.args.get('search', '')
+    selected_aircraft = request.args.get('aircraft_registration', '')
+
+    query = db.session.query(Componentes)
+
+    if selected_aircraft:
+        query = query.filter_by(aircraft_registration=selected_aircraft)
+
+    if search:
+        search_pattern = f"%{search}%"
+        query = query.filter(
+            (Componentes.part_number.ilike(search_pattern)) |
+            (Componentes.description.ilike(search_pattern)) |
+            (Componentes.serial_number.ilike(search_pattern))
+        )
+
+    components = query.order_by(Componentes.entry_date.desc()).all()
+
+    aircrafts = db.session.query(Componentes.aircraft_registration).distinct().all()
+    aircrafts = [a[0] for a in aircrafts if a[0]]  # Elimina registros None
+
+    return render_template('inventory.html', components=components, aircrafts=aircrafts, selected_aircraft=selected_aircraft)
+
 
 class StockItem(db.Model):
     __tablename__ = 'stock_items'
