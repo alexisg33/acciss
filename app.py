@@ -84,6 +84,25 @@ def inventory():
 
     return render_template('inventory.html', components=components, aircrafts=aircrafts, selected_aircraft=selected_aircraft)
 
+@app.route('/register_in', methods=['GET', 'POST'])
+def register_in():
+    if request.method == 'POST':
+        nuevo = Component(
+            part_number=request.form['part_number'],
+            description=request.form['description'],
+            serial_number=request.form['serial_number'],
+            location=request.form['location'],
+            status=request.form['status'],
+            technician=request.form['technician'],
+            aircraft_registration=request.form['aircraft_registration'],
+            wo_number=request.form['wo_number'],
+            entry_date=datetime.now().strftime('%Y-%m-%d')
+        )
+        db.session.add(nuevo)
+        db.session.commit()
+        return redirect(url_for('componentes'))
+    return render_template('register_in.html')  # Asegúrate de tener este HTML
+
 
 class StockItem(db.Model):
     __tablename__ = 'stock_items'
@@ -323,25 +342,6 @@ def registrar_consumo():
 
     return jsonify({'status': 'success'})
 
-
-@app.route('/register_in', methods=['GET', 'POST'])
-def register_in():
-    if request.method == 'POST':
-        nuevo = Component(
-            part_number=request.form['part_number'],
-            description=request.form['description'],
-            serial_number=request.form['serial_number'],
-            location=request.form['location'],
-            status=request.form['status'],
-            technician=request.form['technician'],
-            aircraft_registration=request.form['aircraft_registration'],
-            wo_number=request.form['wo_number'],
-            entry_date=datetime.now().strftime('%Y-%m-%d')
-        )
-        db.session.add(nuevo)
-        db.session.commit()
-        return redirect(url_for('componentes'))
-    return render_template('register_in.html')  # Asegúrate de tener este HTML
 
 if __name__ == '__main__':
     with app.app_context():
