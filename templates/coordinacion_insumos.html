@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Coordinacion insumos</title>
+</head>
+<body>
+    <h2>Módulo: Coordinacion insumos (en construcción)</h2>
+    
+</body>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>ID de Stock</th>
+            <th>Material</th>
+            <th>Part Number</th>
+            <th>Empleado</th>
+            <th>Fecha</th>
+            <th>Cantidad</th>
+            <th>Comentarios</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for baja in bajas %}
+        <tr>
+            <td>{{ baja.id }}</td>
+            <td>{{ baja.stock_id }}</td>
+            <td>{{ baja.stock.material_description if baja.stock else '—' }}</td>
+            <td>{{ baja.stock.part_number if baja.stock else '—' }}</td>
+            <td>{{ baja.employee_id }}</td>
+            <td>{{ baja.date }}</td>
+            <td>{{ baja.quantity }}</td>
+            <td>{{ baja.comments }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</html>

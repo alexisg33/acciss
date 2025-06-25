@@ -375,6 +375,11 @@ def register_out(id):
     return redirect(url_for('inventory'))
 
 
+@app.route('/coordinacion_insumos')
+def coordinacion_insumos():
+    bajas = StockBaja.query.order_by(StockBaja.date.desc()).all()
+    return render_template('coordinacion_insumos.html', bajas=bajas)
+
 
 if __name__ == '__main__':
     with app.app_context():
