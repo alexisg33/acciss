@@ -281,9 +281,6 @@ def gaveta_2():
 def gaveta_3():
     return render_template('gaveta_3.html')
 
-@app.route('/coordinacion_insumos')
-def coordinacion_insumos():
-    return render_template('coordinacion_insumos.html')
 
 @app.route('/camara_frigorifica')
 def camara_frigorifica():
@@ -375,12 +372,6 @@ def register_out(id):
     
     db.session.commit()
     return redirect(url_for('inventory'))
-
-
-@app.route('/coordinacion_insumos')
-def coordinacion_insumos_view():
-    bajas = db.session.query(StockBaja).options(joinedload(StockBaja.stock)).order_by(StockBaja.date.desc()).all()
-    return render_template('coordinacion_insumos.html', bajas=bajas)
 
 from sqlalchemy.orm import joinedload
 
