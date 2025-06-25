@@ -62,7 +62,8 @@ def inventory():
     search = request.args.get('search', '')
     selected_aircraft = request.args.get('aircraft_registration', '')
 
-    query = db.session.query(Component)
+    query = db.session.query(Component).filter(Component.output_date == None)
+
 
     if selected_aircraft:
         query = query.filter_by(aircraft_registration=selected_aircraft)
@@ -335,11 +336,15 @@ def historial_salidas():
 def register_out(id):
     component = Component.query.get_or_404(id)
     component.output_date = datetime.now().strftime('%Y-%m-%d')
-    component.output_technician = request.form['output_technician']
-    component.output_destination = request.form['output_destination']
-    component.output_location = request.form['output_location']
+    
+    # Aquí cambias esas tres líneas por las que te doy abajo:
+    component.output_technician = request.form.get('output_technician', '')
+    component.output_destination = request.form.get('output_destination', '')
+    component.output_location = request.form.get('output_location', '')
+    
     db.session.commit()
     return redirect(url_for('inventory'))
+
 
 
 if __name__ == '__main__':
