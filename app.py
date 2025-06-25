@@ -331,6 +331,16 @@ def historial_salidas():
     salidas = Component.query.filter(Component.output_date != None).order_by(Component.output_date.desc()).all()
     return render_template('historial_salidas.html', salidas=salidas)
 
+@app.route('/register_out/<int:id>', methods=['POST'])
+def register_out(id):
+    component = Component.query.get_or_404(id)
+    component.output_date = datetime.now().strftime('%Y-%m-%d')
+    component.output_technician = request.form['output_technician']
+    component.output_destination = request.form['output_destination']
+    component.output_location = request.form['output_location']
+    db.session.commit()
+    return redirect(url_for('inventory'))
+
 
 if __name__ == '__main__':
     with app.app_context():
