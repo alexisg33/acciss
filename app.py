@@ -329,6 +329,29 @@ def registrar_consumo():
 def chart():
     return render_template('chart.html')
 
+@app.route('/chart_data')
+def chart_data():
+    components = Component.query.all()
+    entradas = {}
+    salidas = {}
+
+    for c in components:
+        reg = c.aircraft_registration or 'Sin Matrícula'
+
+        entradas[reg] = entradas.get(reg, 0) + 1
+        if c.output_date:
+            salidas[reg] = salidas.get(reg, 0) + 1
+
+    labels = list(entradas.keys())
+    entradas_data = [entradas[reg] for reg in labels]
+    salidas_data = [salidas.get(reg, 0) for reg in labels]
+
+    return jsonify({
+        'labels': labels,
+        'entradas': entradas_data,
+        'salidas': salidas_data
+    })
+
 @app.route('/historial_salidas')
 def historial_salidas():
     salidas = Component.query.filter(Component.output_date != None).order_by(Component.output_date.desc()).all()
