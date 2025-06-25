@@ -112,6 +112,9 @@ class StockBaja(db.Model):
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+ stock = db.relationship("StockMaterial", backref="bajas")
+ 
+
 
 @app.route('/')
 def index():
@@ -376,9 +379,24 @@ def register_out(id):
 
 
 @app.route('/coordinacion_insumos')
-def coordinacion_insumos():
-    bajas = StockBaja.query.order_by(StockBaja.date.desc()).all()
+def coordinacion_insumos_view():
+    bajas = db.session.query(StockBaja).options(joinedload(StockBaja.stock)).order_by(StockBaja.date.desc()).all()
     return render_template('coordinacion_insumos.html', bajas=bajas)
+
+from sqlalchemy.orm import joinedload
+
+@app.route('/coordinacion_insumos')
+def coordinacion_insumos():
+     # lógica nueva con joins
+    bajas = db.session.query(StockBaja).options(joinedload(StockBaja.stock)).order_by(StockBaja.date.desc()).all()
+    return render_template('coordinacion_insumos.html', bajas=bajas)
+class StockMaterial(db.Model):
+    __tablename__ = 'stock_materials'
+    id = db.Column(db.Integer, primary_key=True)
+    material_description = db.Column(db.String)
+    part_number = db.Column(db.String)
+    # otros campos...
+
 
 
 if __name__ == '__main__':
