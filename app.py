@@ -338,19 +338,23 @@ def chart_data():
     for c in components:
         reg = c.aircraft_registration or 'Sin Matrícula'
 
-        entradas[reg] = entradas.get(reg, 0) + 1
-        if c.output_date:
+        # Solo contamos la entrada si el componente sigue en inventario (sin salida)
+        if not c.output_date:
+            entradas[reg] = entradas.get(reg, 0) + 1
+        else:
             salidas[reg] = salidas.get(reg, 0) + 1
 
-    labels = list(entradas.keys())
+    # Solo mostramos las matrículas que tienen al menos un componente activo
+    labels = [reg for reg in entradas.keys() if entradas[reg] > 0]
     entradas_data = [entradas[reg] for reg in labels]
-    salidas_data = [salidas.get(reg, 0) for reg in labels]
+    salidas_data = [salidas.get(reg, 0) for reg in labels]  # Puede no haber salidas, por eso .get()
 
     return jsonify({
         'labels': labels,
         'entradas': entradas_data,
         'salidas': salidas_data
     })
+
 
 @app.route('/historial_salidas')
 def historial_salidas():
