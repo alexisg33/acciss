@@ -62,7 +62,7 @@ def inventory():
     search = request.args.get('search', '')
     selected_aircraft = request.args.get('aircraft_registration', '')
 
-    query = db.session.query(Component).filter(Component.output_date == None)
+    query = db.session.query(Component)
 
 
     if selected_aircraft:
