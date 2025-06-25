@@ -54,7 +54,7 @@ def register_in():
         )
         db.session.add(component)
         db.session.commit()
-        return redirect('/inventory')
+        return redirect(url_for('inventory'))  # <- aquí usas el endpoint definido en la ruta /inventario
     return render_template('register_in.html')
 
 @app.route('/inventario', methods=['GET'])
