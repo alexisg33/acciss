@@ -141,7 +141,7 @@ def refrigerador_1():
         {"material": "Epoxy Paste Adhesive", "part_number": "EA956", "base": 100, "hardener": 58},
         {"material": "Epoxy Paste Adhesive", "part_number": "EA9309.3NA", "base": 100, "hardener": 22}
     ]
-    stock_items = StockItem.query.all()
+    stock_items = StockItem.query.filter(StockItem.quantity > 0).all()
     return render_template('refrigerador_1.html', resinas=resinas, stock_items=stock_items)
 
 @app.route('/upload_datasheet/<part_number>', methods=['GET', 'POST'])
