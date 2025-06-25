@@ -64,6 +64,8 @@ def inventory():
 
     query = db.session.query(Component)
 
+    # Mostrar solo componentes que no tienen salida registrada
+    query = query.filter((Component.output_date == None) | (Component.output_date == ''))
 
     if selected_aircraft:
         query = query.filter_by(aircraft_registration=selected_aircraft)
@@ -79,7 +81,7 @@ def inventory():
     components = query.order_by(Component.entry_date.desc()).all()
 
     aircrafts = db.session.query(Component.aircraft_registration).distinct().all()
-    aircrafts = [a[0] for a in aircrafts if a[0]]  # Elimina registros None
+    aircrafts = [a[0] for a in aircrafts if a[0]]
 
     return render_template('inventory.html', components=components, aircrafts=aircrafts, selected_aircraft=selected_aircraft)
 
