@@ -326,6 +326,11 @@ def registrar_consumo():
 def chart():
     return render_template('chart.html')
 
+@app.route('/historial_salidas')
+def historial_salidas():
+    salidas = Component.query.filter(Component.output_date != None).order_by(Component.output_date.desc()).all()
+    return render_template('historial_salidas.html', salidas=salidas)
+
 
 if __name__ == '__main__':
     with app.app_context():
