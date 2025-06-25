@@ -104,15 +104,14 @@ class StockItem(db.Model):
 class StockBaja(db.Model):
     __tablename__ = 'stock_bajas'
     id = db.Column(db.Integer, primary_key=True)
-    stock_id = db.Column(db.Integer)
+    stock_id = db.Column(db.Integer, db.ForeignKey('stock_items.id'))  # Asegúrate del nombre correcto
     employee_id = db.Column(db.String)
     date = db.Column(db.String)
     quantity = db.Column(db.Integer)
     comments = db.Column(db.String)
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
- stock = db.relationship("StockMaterial", backref="bajas")
+    stock = db.relationship("StockItem", backref="bajas")  # Aquí debe coincidir con tu modelo real
+
  
 
 
