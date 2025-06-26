@@ -299,7 +299,82 @@ async function enviarRegistro(event) {
         alert('Error al registrar entrada');
     }
 }
+
+<script>
+function autocompletarDatos() {
+  const idInput = document.querySelector('input[name="stock_id"]');
+  idInput.addEventListener('change', async () => {
+    const id = idInput.value;
+    if (id) {
+      const response = await fetch(`/get_material/${id}`);
+      if (response.ok) {
+        const data = await response.json();
+        document.querySelector('input[name="descripcion"]').value = data.descripcion || '';
+        document.querySelector('input[name="part_number"]').value = data.part_number || '';
+      } else {
+        alert("Material no encontrado");
+        document.querySelector('input[name="descripcion"]').value = '';
+        document.querySelector('input[name="part_number"]').value = '';
+      }
+    }
+  });
+}
+
+window.onload = autocompletarDatos;
 </script>
+<form method="POST" action="{{ url_for('registrar_consumo') }}">
+  <label>ID del Material:</label><br>
+  <input type="text" name="stock_id" required><br><br>
+
+  <label>Descripción:</label><br>
+  <input type="text" name="descripcion" readonly><br><br>
+
+  <label>Part Number:</label><br>
+  <input type="text" name="part_number" readonly><br><br>
+
+  <label>Número de Empleado:</label><br>
+  <input type="text" name="empleado" required><br><br>
+
+  <label>Cantidad Consumida (g):</label><br>
+  <input type="number" step="any" name="cantidad" required><br><br>
+
+  <label>Coincide con Etiqueta:</label><br>
+  <input type="text" name="coincide"><br><br>
+
+  <label>Lote:</label><br>
+  <input type="text" name="lote"><br><br>
+
+  <label>Comentarios:</label><br>
+  <input type="text" name="comentarios"><br><br>
+
+  <button type="submit">Aceptar</button>
+</form>
+
+<h3 style="margin-top: 40px;">Historial de Consumo</h3>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Stock ID</th>
+            <th>Empleado</th>
+            <th>Fecha</th>
+            <th>Cantidad (g)</th>
+            <th>Comentarios</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for baja in bajas %}
+        <tr>
+            <td>{{ baja.id }}</td>
+            <td>{{ baja.stock_id }}</td>
+            <td>{{ baja.empleado }}</td>
+            <td>{{ baja.fecha }}</td>
+            <td>{{ baja.cantidad }}</td>
+            <td>{{ baja.comentarios }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 </body>
 </html>

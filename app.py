@@ -33,6 +33,10 @@ class Component(db.Model):
     output_technician = db.Column(db.String)
     output_destination = db.Column(db.String)
     output_date = db.Column(db.String)
+    
+    lote = db.Column(db.String)
+    comentarios = db.Column(db.String)
+    fecha = db.Column(db.String, default=lambda: datetime.now().strftime('%Y-%m-%d'))
 
 @app.route('/register_in', methods=['GET', 'POST'], endpoint='register_in')
 def register_in():
@@ -287,13 +291,16 @@ def camara_frigorifica():
     return render_template('camara_frigorifica.html')
 
 class StockConsumo(db.Model):
-    __tablename__ = 'stock_consumos'
     id = db.Column(db.Integer, primary_key=True)
     stock_id = db.Column(db.Integer)
-    employee_id = db.Column(db.String)
-    date = db.Column(db.String)
-    quantity = db.Column(db.Integer)
-    comments = db.Column(db.String)
+    descripcion = db.Column(db.String)
+    part_number = db.Column(db.String)
+    empleado = db.Column(db.String)
+    cantidad = db.Column(db.Float)  # gramos
+    coincide = db.Column(db.String)
+    lote = db.Column(db.String)
+    comentarios = db.Column(db.String)
+    fecha = db.Column(db.String, default=lambda: datetime.now().strftime('%Y-%m-%d'))
 
 @app.route('/registrar_consumo', methods=['POST'])
 def registrar_consumo():
@@ -323,6 +330,18 @@ def registrar_consumo():
     db.session.commit()
 
     return jsonify({'status': 'success'})
+class Consumo(db.Model):
+    __tablename__ = 'consumo'
+    id = db.Column(db.Integer, primary_key=True)
+    stock_id = db.Column(db.Integer)
+    empleado = db.Column(db.String)
+    fecha = db.Column(db.String, default=lambda: datetime.now().strftime('%Y-%m-%d'))
+    cantidad = db.Column(db.Float)
+    descripcion = db.Column(db.String)
+    part_number = db.Column(db.String)
+    coincide = db.Column(db.String)
+    lote = db.Column(db.String)
+    comentarios = db.Column(db.String)
 
 @app.route('/chart')
 def chart():
@@ -386,6 +405,54 @@ class StockMaterial(db.Model):
     material_description = db.Column(db.String)
     part_number = db.Column(db.String)
     # otros campos...
+
+
+@app.route('/registrar_consumo', methods=['POST'])
+def registrar_consumo():
+    stock_id = request.form['stock_id']
+    descripcion = request.form.get('descripcion')
+    part_number = request.form.get('part_number')
+    empleado = request.form.get('empleado')
+    cantidad = request.form.get('cantidad')
+    coincide = request.form.get('coincide', '')
+    lote = request.form.get('lote', '')
+    comentarios = request.form.get('comentarios', '')
+
+    nuevo_consumo = StockConsumo(
+        stock_id=stock_id,
+        descripcion=descripcion,
+        part_number=part_number,
+        empleado=empleado,
+        cantidad=cantidad,
+        coincide=coincide,
+        lote=lote,
+        comentarios=comentarios
+    )
+    db.session.add(nuevo_consumo)
+    db.session.commit()
+
+    return redirect(url_for('refrigerador_1'))
+
+
+
+@app.route('/refrigerador_1')
+def refrigerador_1():
+    resinas = Resina.query.all()
+    stock_items = StockMaterial.query.all()
+    bajas = StockConsumo.query.order_by(StockConsumo.fecha.desc()).all()
+    return render_template('refrigerador_1.html', resinas=resinas, stock_items=stock_items, bajas=bajas)
+
+
+@app.route('/get_material/<int:stock_id>')
+def get_material(stock_id):
+    material = Component.query.get(stock_id)
+    if material:
+        return jsonify({
+            'descripcion': material.description,
+            'part_number': material.part_number,
+            'lote': getattr(material, 'lote', '')  # Si tienes campo lote
+        })
+    return jsonify({'error': 'Material no encontrado'}), 404
 
 
 
