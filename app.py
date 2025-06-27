@@ -1,5 +1,3 @@
-# app.py - Versión final corregida
-
 import os
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, jsonify
@@ -290,6 +288,46 @@ def gaveta_3():
 def camara_frigorifica():
     return render_template('camara_frigorifica.html')
 
+class StockConsumo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    stock_id = db.Column(db.Integer)
+    descripcion = db.Column(db.String)
+    part_number = db.Column(db.String)
+    empleado = db.Column(db.String)
+    cantidad = db.Column(db.Float)  # gramos
+    coincide = db.Column(db.String)
+    lote = db.Column(db.String)
+    comentarios = db.Column(db.String)
+    fecha = db.Column(db.String, default=lambda: datetime.now().strftime('%Y-%m-%d'))
+
+@app.route('/registrar_consumo', methods=['POST'])
+def registrar_consumo():
+    data = request.json
+    material_id = int(data['id'])
+    cantidad = int(data['quantity'])
+    empleado = data['employee_id']
+
+    item = StockItem.query.get(material_id)
+    if not item:
+        return jsonify({'status': 'error', 'message': 'Material no encontrado'}), 404
+
+    if item.quantity < cantidad:
+        return jsonify({'status': 'error', 'message': 'Cantidad insuficiente'}), 400
+
+    item.quantity -= cantidad
+    db.session.commit()
+
+    consumo = StockConsumo(
+        stock_id=material_id,
+        employee_id=empleado,
+        quantity=cantidad,
+        date=datetime.now().strftime('%Y-%m-%d'),
+        comments=f"Consumo registrado por empleado {empleado}"
+    )
+    db.session.add(consumo)
+    db.session.commit()
+
+    return jsonify({'status': 'success'})
 class Consumo(db.Model):
     __tablename__ = 'consumo'
     id = db.Column(db.Integer, primary_key=True)
@@ -364,14 +402,8 @@ class StockMaterial(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     material_description = db.Column(db.String)
     part_number = db.Column(db.String)
-    hazards_identified = db.Column(db.String)
-    date = db.Column(db.String)
-    quantity = db.Column(db.Integer)
-    after_open = db.Column(db.String)
-    expiration_date = db.Column(db.String)
-    due_date_match = db.Column(db.String)
-    batch_number = db.Column(db.String)
-    comments = db.Column(db.String)
+    # otros campos...
+
 
 @app.route('/registrar_consumo', methods=['POST'])
 def registrar_consumo():
@@ -400,6 +432,15 @@ def registrar_consumo():
     return redirect(url_for('refrigerador_1'))
 
 
+
+@app.route('/refrigerador_1')
+def refrigerador_1():
+    resinas = Resina.query.all()
+    stock_items = StockMaterial.query.all()
+    bajas = StockConsumo.query.order_by(StockConsumo.fecha.desc()).all()
+    return render_template('refrigerador_1.html', resinas=resinas, stock_items=stock_items, bajas=bajas)
+
+
 @app.route('/get_material/<int:stock_id>')
 def get_material(stock_id):
     material = Component.query.get(stock_id)
@@ -411,18 +452,6 @@ def get_material(stock_id):
         })
     return jsonify({'error': 'Material no encontrado'}), 404
 
-class StockConsumo(db.Model):
-    __tablename__ = 'stock_consumo'
-    id = db.Column(db.Integer, primary_key=True)
-    stock_id = db.Column(db.Integer)
-    descripcion = db.Column(db.String)
-    part_number = db.Column(db.String)
-    empleado = db.Column(db.String)
-    cantidad = db.Column(db.Float)
-    coincide = db.Column(db.String)
-    lote = db.Column(db.String)
-    comentarios = db.Column(db.String)
-    fecha = db.Column(db.String, default=lambda: datetime.now().strftime('%Y-%m-%d'))
 
 
 if __name__ == '__main__':
