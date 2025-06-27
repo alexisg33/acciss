@@ -376,8 +376,14 @@ class StockMaterial(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     material_description = db.Column(db.String)
     part_number = db.Column(db.String)
-    # otros campos...
-
+    hazards_identified = db.Column(db.String)
+    date = db.Column(db.String)
+    quantity = db.Column(db.Integer)
+    after_open = db.Column(db.String)
+    expiration_date = db.Column(db.String)
+    due_date_match = db.Column(db.String)
+    batch_number = db.Column(db.String)
+    comments = db.Column(db.String)
 
 @app.route('/registrar_consumo', methods=['POST'])
 def registrar_consumo():
@@ -426,6 +432,18 @@ def get_material(stock_id):
         })
     return jsonify({'error': 'Material no encontrado'}), 404
 
+class StockConsumo(db.Model):
+    __tablename__ = 'stock_consumo'
+    id = db.Column(db.Integer, primary_key=True)
+    stock_id = db.Column(db.Integer)
+    descripcion = db.Column(db.String)
+    part_number = db.Column(db.String)
+    empleado = db.Column(db.String)
+    cantidad = db.Column(db.Float)
+    coincide = db.Column(db.String)
+    lote = db.Column(db.String)
+    comentarios = db.Column(db.String)
+    fecha = db.Column(db.String, default=lambda: datetime.now().strftime('%Y-%m-%d'))
 
 
 if __name__ == '__main__':
