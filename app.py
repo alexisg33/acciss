@@ -302,34 +302,6 @@ class StockConsumo(db.Model):
     comentarios = db.Column(db.String)
     fecha = db.Column(db.String, default=lambda: datetime.now().strftime('%Y-%m-%d'))
 
-@app.route('/registrar_consumo', methods=['POST'])
-def registrar_consumo():
-    data = request.json
-    material_id = int(data['id'])
-    cantidad = int(data['quantity'])
-    empleado = data['employee_id']
-
-    item = StockItem.query.get(material_id)
-    if not item:
-        return jsonify({'status': 'error', 'message': 'Material no encontrado'}), 404
-
-    if item.quantity < cantidad:
-        return jsonify({'status': 'error', 'message': 'Cantidad insuficiente'}), 400
-
-    item.quantity -= cantidad
-    db.session.commit()
-
-    consumo = StockConsumo(
-        stock_id=material_id,
-        employee_id=empleado,
-        quantity=cantidad,
-        date=datetime.now().strftime('%Y-%m-%d'),
-        comments=f"Consumo registrado por empleado {empleado}"
-    )
-    db.session.add(consumo)
-    db.session.commit()
-
-    return jsonify({'status': 'success'})
 class Consumo(db.Model):
     __tablename__ = 'consumo'
     id = db.Column(db.Integer, primary_key=True)
