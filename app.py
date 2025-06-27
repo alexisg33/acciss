@@ -290,18 +290,6 @@ def gaveta_3():
 def camara_frigorifica():
     return render_template('camara_frigorifica.html')
 
-class StockConsumo(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    stock_id = db.Column(db.Integer)
-    descripcion = db.Column(db.String)
-    part_number = db.Column(db.String)
-    empleado = db.Column(db.String)
-    cantidad = db.Column(db.Float)  # gramos
-    coincide = db.Column(db.String)
-    lote = db.Column(db.String)
-    comentarios = db.Column(db.String)
-    fecha = db.Column(db.String, default=lambda: datetime.now().strftime('%Y-%m-%d'))
-
 class Consumo(db.Model):
     __tablename__ = 'consumo'
     id = db.Column(db.Integer, primary_key=True)
