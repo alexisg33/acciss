@@ -412,15 +412,6 @@ def registrar_consumo():
     return redirect(url_for('refrigerador_1'))
 
 
-
-@app.route('/refrigerador_1')
-def refrigerador_1():
-    resinas = Resina.query.all()
-    stock_items = StockMaterial.query.all()
-    bajas = StockConsumo.query.order_by(StockConsumo.fecha.desc()).all()
-    return render_template('refrigerador_1.html', resinas=resinas, stock_items=stock_items, bajas=bajas)
-
-
 @app.route('/get_material/<int:stock_id>')
 def get_material(stock_id):
     material = Component.query.get(stock_id)
