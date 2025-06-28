@@ -300,28 +300,30 @@ async function enviarRegistro(event) {
     }
 }
 
-<script>
 function autocompletarDatos() {
-  const idInput = document.querySelector('input[name="stock_id"]');
-  idInput.addEventListener('change', async () => {
-    const id = idInput.value;
-    if (id) {
-      const response = await fetch(`/get_material/${id}`);
-      if (response.ok) {
-        const data = await response.json();
-        document.querySelector('input[name="descripcion"]').value = data.descripcion || '';
-        document.querySelector('input[name="part_number"]').value = data.part_number || '';
-      } else {
-        alert("Material no encontrado");
-        document.querySelector('input[name="descripcion"]').value = '';
-        document.querySelector('input[name="part_number"]').value = '';
-      }
-    }
-  });
+    const idInput = document.querySelector('input[name="stock_id"]');
+    if (!idInput) return;
+
+    idInput.addEventListener('change', async () => {
+        const id = idInput.value;
+        if (id) {
+            const response = await fetch(`/get_material/${id}`);
+            if (response.ok) {
+                const data = await response.json();
+                document.querySelector('input[name="descripcion"]').value = data.descripcion || '';
+                document.querySelector('input[name="part_number"]').value = data.part_number || '';
+            } else {
+                alert("Material no encontrado");
+                document.querySelector('input[name="descripcion"]').value = '';
+                document.querySelector('input[name="part_number"]').value = '';
+            }
+        }
+    });
 }
 
 window.onload = autocompletarDatos;
 </script>
+
 <form method="POST" action="{{ url_for('registrar_consumo') }}">
   <label>ID del Material:</label><br>
   <input type="text" name="stock_id" required><br><br>
@@ -375,6 +377,7 @@ window.onload = autocompletarDatos;
         {% endfor %}
     </tbody>
 </table>
+
 
 </body>
 </html>
