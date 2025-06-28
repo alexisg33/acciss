@@ -1,4 +1,4 @@
- # app.py - Versión final corregida
+# app.py - Versión final corregida
 
 import os
 from datetime import datetime
@@ -33,10 +33,6 @@ class Component(db.Model):
     output_technician = db.Column(db.String)
     output_destination = db.Column(db.String)
     output_date = db.Column(db.String)
-    
-    lote = db.Column(db.String)
-    comentarios = db.Column(db.String)
-    fecha = db.Column(db.String, default=lambda: datetime.now().strftime('%Y-%m-%d'))
 
 @app.route('/register_in', methods=['GET', 'POST'], endpoint='register_in')
 def register_in():
@@ -148,7 +144,8 @@ def refrigerador_1():
         {"material": "Epoxy Paste Adhesive", "part_number": "EA9309.3NA", "base": 100, "hardener": 22}
     ]
     stock_items = StockItem.query.filter(StockItem.quantity > 0).all()
-    return render_template('refrigerador_1.html', resinas=resinas, stock_items=stock_items)
+    consumos = Consumo.query.order_by(Consumo.fecha.desc()).all()
+    return render_template('refrigerador_1.html', resinas=resinas, stock_items=stock_items, consumos=consumos)
 
 @app.route('/upload_datasheet/<part_number>', methods=['GET', 'POST'])
 def upload_datasheet(part_number):
@@ -291,17 +288,42 @@ def camara_frigorifica():
     return render_template('camara_frigorifica.html')
 
 class StockConsumo(db.Model):
+    __tablename__ = 'stock_consumos'
     id = db.Column(db.Integer, primary_key=True)
     stock_id = db.Column(db.Integer)
-    descripcion = db.Column(db.String)
-    part_number = db.Column(db.String)
-    empleado = db.Column(db.String)
-    cantidad = db.Column(db.Float)  # gramos
-    coincide = db.Column(db.String)
-    lote = db.Column(db.String)
-    comentarios = db.Column(db.String)
-    fecha = db.Column(db.String, default=lambda: datetime.now().strftime('%Y-%m-%d'))
+    employee_id = db.Column(db.String)
+    date = db.Column(db.String)
+    quantity = db.Column(db.Integer)
+    comments = db.Column(db.String)
 
+@app.route('/registrar_consumo', methods=['POST'])
+def registrar_consumo():
+    data = request.json
+    material_id = int(data['id'])
+    cantidad = int(data['quantity'])
+    empleado = data['employee_id']
+
+    item = StockItem.query.get(material_id)
+    if not item:
+        return jsonify({'status': 'error', 'message': 'Material no encontrado'}), 404
+
+    if item.quantity < cantidad:
+        return jsonify({'status': 'error', 'message': 'Cantidad insuficiente'}), 400
+
+    item.quantity -= cantidad
+    db.session.commit()
+
+    consumo = StockConsumo(
+        stock_id=material_id,
+        employee_id=empleado,
+        quantity=cantidad,
+        date=datetime.now().strftime('%Y-%m-%d'),
+        comments=f"Consumo registrado por empleado {empleado}"
+    )
+    db.session.add(consumo)
+    db.session.commit()
+
+    return jsonify({'status': 'success'})
 class Consumo(db.Model):
     __tablename__ = 'consumo'
     id = db.Column(db.Integer, primary_key=True)
@@ -382,37 +404,32 @@ class StockMaterial(db.Model):
 @app.route('/registrar_consumo', methods=['POST'])
 def registrar_consumo():
     stock_id = request.form['stock_id']
-    descripcion = request.form.get('descripcion')
-    part_number = request.form.get('part_number')
-    empleado = request.form.get('empleado')
-    cantidad = request.form.get('cantidad')
+    empleado = request.form['empleado']
+    cantidad = request.form['cantidad']
     coincide = request.form.get('coincide', '')
     lote = request.form.get('lote', '')
     comentarios = request.form.get('comentarios', '')
 
-    nuevo_consumo = StockConsumo(
-        stock_id=stock_id,
-        descripcion=descripcion,
-        part_number=part_number,
-        empleado=empleado,
-        cantidad=cantidad,
-        coincide=coincide,
-        lote=lote,
-        comentarios=comentarios
-    )
-    db.session.add(nuevo_consumo)
-    db.session.commit()
+    # Buscar material original
+    material = db.session.execute(
+        db.select(Component).where(Component.id == stock_id)
+    ).scalar_one_or_none()
 
-    return redirect(url_for('refrigerador_1'))
+    if material:
+        nuevo_consumo = Consumo(
+            stock_id=stock_id,
+            empleado=empleado,
+            cantidad=cantidad,
+            descripcion=material.description,
+            part_number=material.part_number,
+            coincide=coincide,
+            lote=lote,
+            comentarios=comentarios
+        )
+        db.session.add(nuevo_consumo)
+        db.session.commit()
 
-
-
-@app.route('/refrigerador_1')
-def refrigerador_1():
-    resinas = Resina.query.all()
-    stock_items = StockMaterial.query.all()
-    bajas = StockConsumo.query.order_by(StockConsumo.fecha.desc()).all()
-    return render_template('refrigerador_1.html', resinas=resinas, stock_items=stock_items, bajas=bajas)
+    return redirect(url_for('refrigerador_1'))  # O la ruta de tu módulo
 
 
 @app.route('/get_material/<int:stock_id>')
@@ -421,11 +438,9 @@ def get_material(stock_id):
     if material:
         return jsonify({
             'descripcion': material.description,
-            'part_number': material.part_number,
-            'lote': getattr(material, 'lote', '')  # Si tienes campo lote
+            'part_number': material.part_number
         })
     return jsonify({'error': 'Material no encontrado'}), 404
-
 
 
 if __name__ == '__main__':
