@@ -401,37 +401,6 @@ class StockMaterial(db.Model):
     # otros campos...
 
 
-@app.route('/registrar_consumo', methods=['POST'])
-def registrar_consumo():
-    stock_id = request.form['stock_id']
-    empleado = request.form['empleado']
-    cantidad = request.form['cantidad']
-    coincide = request.form.get('coincide', '')
-    lote = request.form.get('lote', '')
-    comentarios = request.form.get('comentarios', '')
-
-    # Buscar material original
-    material = db.session.execute(
-        db.select(Component).where(Component.id == stock_id)
-    ).scalar_one_or_none()
-
-    if material:
-        nuevo_consumo = Consumo(
-            stock_id=stock_id,
-            empleado=empleado,
-            cantidad=cantidad,
-            descripcion=material.description,
-            part_number=material.part_number,
-            coincide=coincide,
-            lote=lote,
-            comentarios=comentarios
-        )
-        db.session.add(nuevo_consumo)
-        db.session.commit()
-
-    return redirect(url_for('refrigerador_1'))  # O la ruta de tu módulo
-
-
 @app.route('/get_material/<int:stock_id>')
 def get_material(stock_id):
     material = Component.query.get(stock_id)
