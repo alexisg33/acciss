@@ -295,6 +295,20 @@ class StockConsumo(db.Model):
     date = db.Column(db.String)
     quantity = db.Column(db.Integer)
     comments = db.Column(db.String)
+    
+    class Consumo(db.Model):
+        __tablename__ = 'consumo'
+    id = db.Column(db.Integer, primary_key=True)
+    stock_id = db.Column(db.Integer)
+    empleado = db.Column(db.String)
+    fecha = db.Column(db.String, default=lambda: datetime.now().strftime('%Y-%m-%d'))
+    cantidad = db.Column(db.Float)
+    descripcion = db.Column(db.String)
+    part_number = db.Column(db.String)
+    coincide = db.Column(db.String)
+    lote = db.Column(db.String)
+    comentarios = db.Column(db.String)
+
 
 @app.route('/registrar_consumo', methods=['POST'])
 def registrar_consumo():
