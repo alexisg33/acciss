@@ -287,18 +287,9 @@ def gaveta_3():
 def camara_frigorifica():
     return render_template('camara_frigorifica.html')
 
-class StockConsumo(db.Model):
-    __tablename__ = 'stock_consumos'
-    id = db.Column(db.Integer, primary_key=True)
-    stock_id = db.Column(db.Integer)
-    employee_id = db.Column(db.String)
-    date = db.Column(db.String)
-    quantity = db.Column(db.Integer)
-    comments = db.Column(db.String)
-    
-    class Consumo(db.Model):
-        __tablename__ = 'consumo'
-    id = db.Column(db.Integer, primary_key=True)
+class Consumo(db.Model):
+    __tablename__ = 'consumo'
+    id = db.Column(db.Integer, primary_key=True)  # <- ESTA LÍNEA ES FUNDAMENTAL
     stock_id = db.Column(db.Integer)
     empleado = db.Column(db.String)
     fecha = db.Column(db.String, default=lambda: datetime.now().strftime('%Y-%m-%d'))
@@ -308,6 +299,7 @@ class StockConsumo(db.Model):
     coincide = db.Column(db.String)
     lote = db.Column(db.String)
     comentarios = db.Column(db.String)
+
 
 
 @app.route('/registrar_consumo', methods=['POST'])
