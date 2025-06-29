@@ -352,31 +352,6 @@ window.onload = autocompletarDatos;
   <button type="submit">Aceptar</button>
 </form>
 
-<h3 style="margin-top: 40px;">Historial de Consumo</h3>
-<table>
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Stock ID</th>
-            <th>Empleado</th>
-            <th>Fecha</th>
-            <th>Cantidad (g)</th>
-            <th>Comentarios</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for baja in bajas %}
-        <tr>
-            <td>{{ baja.id }}</td>
-            <td>{{ baja.stock_id }}</td>
-            <td>{{ baja.empleado }}</td>
-            <td>{{ baja.fecha }}</td>
-            <td>{{ baja.cantidad }}</td>
-            <td>{{ baja.comentarios }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
 
 
 </body>
