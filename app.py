@@ -412,9 +412,13 @@ def generar_qr_componente(id):
     columns = ['id', 'part_number', 'description', 'serial_number', 'entry_date', 'location',
                'status', 'technician', 'aircraft_registration', 'output_location',
                'output_technician', 'output_destination', 'output_date', 'wo_number']
-    
-    componente = dict(zip(columns, row + (None,) if len(row) == len(columns) - 1 else row))
-    
+
+    # Compatibilidad si hay una columna extra o falta
+    if len(row) < len(columns):
+        row = row + (None,) * (len(columns) - len(row))
+
+    componente = dict(zip(columns, row))
+
     texto_qr = f"""
 ID: {componente['id']}
 PN: {componente['part_number']}
@@ -423,13 +427,25 @@ WO: {componente.get('wo_number', '')}
 Técnico: {componente['technician']}
 Estado: {componente['status']}
 Ubicación: {componente['location']}
-"""
+""".strip()
 
-    ruta_qr = f"static/qrs/componente_{componente['id']}.png"
-    generar_qr(texto_qr.strip(), ruta_qr)
-    return redirect('/' + ruta_qr)
+    # Generamos un QR en memoria, no en archivos (RECOMENDADO en Render)
+    import io
+    from flask import send_file
+    from utils_qr import generar_qr
 
+    img_bytes = io.BytesIO()
+    generar_qr(texto_qr, img_bytes)
+    img_bytes.seek(0)
 
+    return send_file(img_bytes, mimetype='image/png')
+
+@app.route('/qr_img/<int:id>')
+def mostrar_qr_en_tabla(id):
+    ruta_qr = f"static/qrs/componente_{id}.png"
+    if not os.path.exists(ruta_qr):
+        return "QR no encontrado", 404
+    return f'<img src="/{ruta_qr}" alt="QR" width="80">'
 
 if __name__ == '__main__':
     with app.app_context():
