@@ -324,35 +324,6 @@ function autocompletarDatos() {
 window.onload = autocompletarDatos;
 </script>
 
-<form method="POST" action="{{ url_for('registrar_consumo') }}">
-  <label>ID del Material:</label><br>
-  <input type="text" name="stock_id" required><br><br>
-
-  <label>Descripción:</label><br>
-  <input type="text" name="descripcion" readonly><br><br>
-
-  <label>Part Number:</label><br>
-  <input type="text" name="part_number" readonly><br><br>
-
-  <label>Número de Empleado:</label><br>
-  <input type="text" name="empleado" required><br><br>
-
-  <label>Cantidad Consumida (g):</label><br>
-  <input type="number" step="any" name="cantidad" required><br><br>
-
-  <label>Coincide con Etiqueta:</label><br>
-  <input type="text" name="coincide"><br><br>
-
-  <label>Lote:</label><br>
-  <input type="text" name="lote"><br><br>
-
-  <label>Comentarios:</label><br>
-  <input type="text" name="comentarios"><br><br>
-
-  <button type="submit">Aceptar</button>
-</form>
-
-
 
 </body>
 </html>
