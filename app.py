@@ -300,42 +300,25 @@ class StockConsumo(db.Model):
 def registrar_consumo():
     data = request.json
     material_id = int(data['id'])
-    cantidad = int(data['quantity'])
+    cantidad = float(data['quantity'])
     empleado = data['employee_id']
 
-    item = StockItem.query.get(material_id)
-    if not item:
-        return jsonify({'status': 'error', 'message': 'Material no encontrado'}), 404
-
-    if item.quantity < cantidad:
-        return jsonify({'status': 'error', 'message': 'Cantidad insuficiente'}), 400
-
-    item.quantity -= cantidad
-    db.session.commit()
-
-    consumo = StockConsumo(
+    consumo = Consumo(
         stock_id=material_id,
-        employee_id=empleado,
-        quantity=cantidad,
-        date=datetime.now().strftime('%Y-%m-%d'),
-        comments=f"Consumo registrado por empleado {empleado}"
+        empleado=empleado,
+        cantidad=cantidad,
+        fecha=datetime.now().strftime('%Y-%m-%d'),
+        descripcion=data.get('material_description', ''),
+        part_number=data.get('part_number', ''),
+        coincide=data.get('coincide', ''),
+        lote=data.get('lote', ''),
+        comentarios=data.get('comments', '')
     )
     db.session.add(consumo)
     db.session.commit()
 
     return jsonify({'status': 'success'})
-class Consumo(db.Model):
-    __tablename__ = 'consumo'
-    id = db.Column(db.Integer, primary_key=True)
-    stock_id = db.Column(db.Integer)
-    empleado = db.Column(db.String)
-    fecha = db.Column(db.String, default=lambda: datetime.now().strftime('%Y-%m-%d'))
-    cantidad = db.Column(db.Float)
-    descripcion = db.Column(db.String)
-    part_number = db.Column(db.String)
-    coincide = db.Column(db.String)
-    lote = db.Column(db.String)
-    comentarios = db.Column(db.String)
+
 
 @app.route('/chart')
 def chart():
