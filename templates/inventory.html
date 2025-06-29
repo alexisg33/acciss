@@ -104,6 +104,7 @@
                 <th>Técnico</th>
                 <th>Matrícula</th>
                 <th>Número de Tarea (W.O.)</th>
+                <th>QR</th>
                 <th>Acción</th>
             </tr>
         </thead>
@@ -120,8 +121,10 @@
                 <td>{{ c.technician }}</td>
                 <td>{{ c.aircraft_registration }}</td>
                 <td>{{ c.wo_number }}</td>
-                <td>
-                    <form method="post" action="{{ url_for('register_out', id=c.id) }}">
+               <td>
+        <a href="{{ url_for('generar_qr_componente', id=c.id) }}" target="_blank">📷 Ver QR</a>
+    </td>
+    <td>
     <input type="text" name="output_location" placeholder="Taller" required>
     <input type="text" name="output_technician" placeholder="Salida No. Empleado" required>
     <input type="text" name="output_destination" placeholder="Destino" required>

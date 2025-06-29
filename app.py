@@ -5,6 +5,8 @@ from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
+from flask import redirect
+from utils_qr import generar_qr
 
 
 app = Flask(__name__)
@@ -395,50 +397,27 @@ def get_material(stock_id):
     return jsonify({'error': 'Material no encontrado'}), 404
 
 
-
-from utils_qr import generar_qr  # importa tu utilidad
-
 @app.route('/qr/<int:id>')
 def generar_qr_componente(id):
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM components WHERE id = ?", (id,))
-    row = cursor.fetchone()
-    conn.close()
-
-    if not row:
+    componente = Component.query.get(id)
+    if not componente:
         return "Componente no encontrado", 404
 
-    columns = ['id', 'part_number', 'description', 'serial_number', 'entry_date', 'location',
-               'status', 'technician', 'aircraft_registration', 'output_location',
-               'output_technician', 'output_destination', 'output_date', 'wo_number']
-
-    # Compatibilidad si hay una columna extra o falta
-    if len(row) < len(columns):
-        row = row + (None,) * (len(columns) - len(row))
-
-    componente = dict(zip(columns, row))
-
     texto_qr = f"""
-ID: {componente['id']}
-PN: {componente['part_number']}
-SN: {componente['serial_number']}
-WO: {componente.get('wo_number', '')}
-Técnico: {componente['technician']}
-Estado: {componente['status']}
-Ubicación: {componente['location']}
+ID: {componente.id}
+PN: {componente.part_number}
+SN: {componente.serial_number}
+WO: {componente.wo_number or ''}
+Técnico: {componente.technician}
+Estado: {componente.status}
+Ubicación: {componente.location}
 """.strip()
 
-    # Generamos un QR en memoria, no en archivos (RECOMENDADO en Render)
-    import io
-    from flask import send_file
-    from utils_qr import generar_qr
+    ruta_qr = f"static/qrs/componente_{componente.id}.png"
+    generar_qr(texto_qr, ruta_qr)
 
-    img_bytes = io.BytesIO()
-    generar_qr(texto_qr, img_bytes)
-    img_bytes.seek(0)
+    return redirect('/' + ruta_qr)
 
-    return send_file(img_bytes, mimetype='image/png')
 
 @app.route('/qr_img/<int:id>')
 def mostrar_qr_en_tabla(id):
