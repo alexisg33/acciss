@@ -1,9 +1,5 @@
-# utils_qr.py
-
 import qrcode
-import os
 
-def generar_qr(datos: str, nombre_archivo: str):
-    os.makedirs(os.path.dirname(nombre_archivo), exist_ok=True)
-    qr = qrcode.make(datos)
-    qr.save(nombre_archivo)
+def generar_qr(texto, destino_io):
+    img = qrcode.make(texto)
+    img.save(destino_io, format="PNG")
