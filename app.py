@@ -94,7 +94,7 @@ class StockItem(db.Model):
     part_number = db.Column(db.String)
     hazards_identified = db.Column(db.String)
     date = db.Column(db.String)
-    quantity = db.Column(db.Integer, default=0)
+    quantity = db.Column(db.Float, default=0.0)
     after_open = db.Column(db.String)
     expiration_date = db.Column(db.String)
     due_date_match = db.Column(db.String)
@@ -399,6 +399,15 @@ def get_material(stock_id):
             'part_number': material.part_number
         })
     return jsonify({'error': 'Material no encontrado'}), 404
+
+@app.route('/reiniciar_tabla_stock_items')
+def reiniciar_tabla_stock_items():
+    try:
+        StockItem.__table__.drop(db.engine)
+        db.create_all()
+        return "✅ Tabla 'stock_items' eliminada y recreada correctamente."
+    except Exception as e:
+        return f"❌ Error al reiniciar la tabla: {e}"
 
 
 if __name__ == '__main__':
