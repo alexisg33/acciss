@@ -305,24 +305,18 @@ class Consumo(db.Model):
 @app.route('/registrar_consumo', methods=['POST'])
 def registrar_consumo():
     data = request.json
-    material_id = int(data['id'])
-    cantidad = float(data['quantity'])
-    empleado = data['employee_id']
-
-    consumo = Consumo(
-        stock_id=material_id,
-        empleado=empleado,
-        cantidad=cantidad,
-        fecha=datetime.now().strftime('%Y-%m-%d'),
-        descripcion=data.get('material_description', ''),
-        part_number=data.get('part_number', ''),
-        coincide=data.get('coincide', ''),
-        lote=data.get('lote', ''),
-        comentarios=data.get('comments', '')
+    nuevo = Consumo(
+        stock_id=data['id'],
+        empleado=data['employee_id'],
+        cantidad=data['quantity'],
+        descripcion=data['material_description'],
+        part_number=data['part_number'],
+        coincide=data['due_date_match'],
+        lote=data['batch_number'],
+        comentarios=f"Consumo registrado por empleado {data['employee_id']}"
     )
-    db.session.add(consumo)
+    db.session.add(nuevo)
     db.session.commit()
-
     return jsonify({'status': 'success'})
 
 
@@ -400,14 +394,41 @@ def get_material(stock_id):
         })
     return jsonify({'error': 'Material no encontrado'}), 404
 
-@app.route('/reiniciar_tabla_stock_items')
-def reiniciar_tabla_stock_items():
-    try:
-        StockItem.__table__.drop(db.engine)
-        db.create_all()
-        return "✅ Tabla 'stock_items' eliminada y recreada correctamente."
-    except Exception as e:
-        return f"❌ Error al reiniciar la tabla: {e}"
+
+
+from utils_qr import generar_qr  # importa tu utilidad
+
+@app.route('/qr/<int:id>')
+def generar_qr_componente(id):
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM components WHERE id = ?", (id,))
+    row = cursor.fetchone()
+    conn.close()
+
+    if not row:
+        return "Componente no encontrado", 404
+
+    columns = ['id', 'part_number', 'description', 'serial_number', 'entry_date', 'location',
+               'status', 'technician', 'aircraft_registration', 'output_location',
+               'output_technician', 'output_destination', 'output_date', 'wo_number']
+    
+    componente = dict(zip(columns, row + (None,) if len(row) == len(columns) - 1 else row))
+    
+    texto_qr = f"""
+ID: {componente['id']}
+PN: {componente['part_number']}
+SN: {componente['serial_number']}
+WO: {componente.get('wo_number', '')}
+Técnico: {componente['technician']}
+Estado: {componente['status']}
+Ubicación: {componente['location']}
+"""
+
+    ruta_qr = f"static/qrs/componente_{componente['id']}.png"
+    generar_qr(texto_qr.strip(), ruta_qr)
+    return redirect('/' + ruta_qr)
+
 
 
 if __name__ == '__main__':
