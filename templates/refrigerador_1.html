@@ -190,7 +190,28 @@
 
 <div id="consumo" class="content-section">
     <h3>Registrar Consumo</h3>
-    <form onsubmit="return enviarBaja(event)">
+    <form onsubmit="return enviarConsumo(event)">
+        <script>
+async function enviarConsumo(event) {
+    event.preventDefault();
+    const form = event.target;
+    const datos = Object.fromEntries(new FormData(form));
+    const response = await fetch('/registrar_consumo', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(datos)
+    });
+    const result = await response.json();
+    if (result.status === 'success') {
+        alert('Consumo registrado correctamente');
+        form.reset();
+        location.reload();
+    } else {
+        alert('Error al registrar consumo');
+    }
+}
+</script>
+
         <input type="number" name="id" placeholder="ID del material" required onchange="cargarMaterial(this.value)">
         <input type="text" name="employee_id" placeholder="Número de empleado" required>
         <input type="number" name="quantity" placeholder="Cantidad consumida (g)" required>
@@ -215,16 +236,18 @@
             </tr>
         </thead>
         <tbody>
-            {% for baja in bajas %}
-            <tr>
-                <td>{{ baja.id }}</td>
-                <td>{{ baja.stock_id }}</td>
-                <td>{{ baja.employee_id }}</td>
-                <td>{{ baja.date }}</td>
-                <td>{{ baja.quantity }}</td>
-                <td>{{ baja.comments }}</td>
-            </tr>
-            {% endfor %}
+            
+{% for c in consumos %}
+<tr>
+    <td>{{ c.id }}</td>
+    <td>{{ c.stock_id }}</td>
+    <td>{{ c.empleado }}</td>
+    <td>{{ c.fecha }}</td>
+    <td>{{ c.cantidad }}</td>
+    <td>{{ c.comentarios }}</td>
+</tr>
+{% endfor %}
+
         </tbody>
     </table>
 </div>
