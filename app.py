@@ -409,14 +409,15 @@ def generar_qr_componente(id):
         return "Componente no encontrado", 404
 
     texto_qr = f"""
-ID: {componente.id}
-PN: {componente.part_number}
-SN: {componente.serial_number}
-WO: {componente.wo_number or ''}
-Técnico: {componente.technician}
-Estado: {componente.status}
-Ubicación: {componente.location}
+ID: {componente['id']}
+PN: {componente['part_number']}
+SN: {componente['serial_number']}
+WO: {componente.get('wo_number', '')}
+Estado: {componente['status']}
+Descripción: {componente['description']}
+Entrada: {componente['entry_date']}
 """.strip()
+
 
     ruta_qr = f"static/qrs/componente_{componente.id}.png"
     generar_qr(texto_qr, ruta_qr)
