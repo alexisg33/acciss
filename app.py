@@ -82,8 +82,15 @@ def inventory():
 
     components = query.order_by(Component.entry_date.desc()).all()
 
-    aircrafts = db.session.query(Component.aircraft_registration).distinct().all()
-    aircrafts = [a[0] for a in aircrafts if a[0]]
+    # Solo aeronaves con componentes activos (sin salida registrada)
+aircrafts = (
+    db.session.query(Component.aircraft_registration)
+    .filter((Component.output_date == None) | (Component.output_date == ''))
+    .distinct()
+    .all()
+)
+aircrafts = [a[0] for a in aircrafts if a[0]]
+
 
     return render_template('inventory.html', components=components, aircrafts=aircrafts, selected_aircraft=selected_aircraft)
 
