@@ -433,6 +433,16 @@ def mostrar_qr_en_tabla(id):
         return "QR no encontrado", 404
     return f'<img src="/{ruta_qr}" alt="QR" width="80">'
 
+@app.route('/aeronaves')
+def aeronaves():
+    # Obtener todas las matrículas únicas que aún tienen componentes en el taller
+    aircrafts = db.session.query(Component.aircraft_registration)\
+        .filter((Component.output_date == None) | (Component.output_date == ''))\
+        .distinct().all()
+    aircrafts = [a[0] for a in aircrafts if a[0]]
+    return render_template('aeronaves_menu.html', aircrafts=aircrafts)
+
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
