@@ -125,6 +125,7 @@
         <a href="{{ url_for('generar_qr_componente', id=c.id) }}" target="_blank">📷 Ver QR</a>
     </td>
     <td>
+    <form method="POST" action="{{ url_for('register_out', id=c.id) }}">
     <input type="text" name="output_location" placeholder="Taller" required>
     <input type="text" name="output_technician" placeholder="Salida No. Empleado" required>
     <input type="text" name="output_destination" placeholder="Destino" required>
