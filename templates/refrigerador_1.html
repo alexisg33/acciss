@@ -190,43 +190,21 @@
 
 <div id="consumo" class="content-section">
     <h3>Registrar Consumo</h3>
-    <form onsubmit="return enviarConsumo(event)">
-        <script>
-async function enviarConsumo(event) {
-    event.preventDefault();
-    const form = event.target;
-    const datos = Object.fromEntries(new FormData(form));
-    const response = await fetch('/registrar_consumo', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(datos)
-    });
-    const result = await response.json();
-    if (result.status === 'success') {
-        alert('Consumo registrado correctamente');
-        form.reset();
-        location.reload();
-    } else {
-        alert('Error al registrar consumo');
-    }
-}
-</script>
 
-<input type="number" name="id" placeholder="ID del material" required onchange="cargarMaterial(this.value)">
-<input type="text" name="employee_id" placeholder="Número de empleado" required>
-<input type="number" name="quantity" placeholder="Cantidad consumida (g)" required>
-
- <!-- Selecciona el Part Number; este SÍ se envía -->
-  <select name="part_number" required>
-      <option value="">Seleccione Part Number</option>
-      {% for r in resinas %}
-      <option value="{{ r.part_number }}">{{ r.part_number }}</option>
-      {% endfor %}
-  </select>
-
-  <br><br>
-  <button class="menu-button" type="submit">Aceptar</button>
+<form onsubmit="return enviarConsumo(event)"><form onsubmit="return enviarConsumo(event)">
+    <input type="number" name="id" placeholder="ID del material" required onchange="cargarMaterial(this.value)">
+    <input type="text" name="employee_id" placeholder="Número de empleado" required>
+    <input type="number" name="quantity" placeholder="Cantidad consumida (g)" required>
+    <select name="part_number" required>
+        <option value="">Seleccione Part Number</option>
+        {% for r in resinas %}
+        <option value="{{ r.part_number }}">{{ r.part_number }}</option>
+        {% endfor %}
+    </select>
+    <br><br>
+    <button class="menu-button" type="submit">Aceptar</button>
 </form>
+
     <h3 style="margin-top: 40px;">Historial de Consumo</h3>
     <table>
   <thead>
@@ -351,5 +329,27 @@ window.onload = autocompletarDatos;
 </script>
 
 
+<script>
+async function enviarConsumo(event) {
+    event.preventDefault();            // detiene el envío clásico
+    const form  = event.target;
+    const datos = Object.fromEntries(new FormData(form));
+
+    const res = await fetch('/registrar_consumo', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(datos)
+    });
+
+    const result = await res.json();
+    if (result.status === 'success') {
+        alert('Consumo registrado correctamente');
+        form.reset();
+        location.reload();             // recarga para ver la fila nueva
+    } else {
+        alert('Error al registrar consumo');
+    }
+}
+</script>
 </body>
 </html>
