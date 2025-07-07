@@ -191,7 +191,7 @@
 <div id="consumo" class="content-section">
     <h3>Registrar Consumo</h3>
 
-<form onsubmit="return enviarConsumo(event)"><form onsubmit="return enviarConsumo(event)">
+<form onsubmit="enviarConsumo(event)"><form onsubmit="enviarConsumo(event)">
     <input type="number" name="id" placeholder="ID del material" required onchange="cargarMaterial(this.value)">
     <input type="text" name="employee_id" placeholder="Número de empleado" required>
     <input type="number" name="quantity" placeholder="Cantidad consumida (g)" required>
