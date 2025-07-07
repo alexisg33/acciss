@@ -212,44 +212,47 @@ async function enviarConsumo(event) {
 }
 </script>
 
-        <input type="number" name="id" placeholder="ID del material" required onchange="cargarMaterial(this.value)">
-        <input type="text" name="employee_id" placeholder="Número de empleado" required>
-        <input type="number" name="quantity" placeholder="Cantidad consumida (g)" required>
-        <input type="text" name="material_description" placeholder="Descripción del material" readonly>
-        <input type="text" name="part_number" placeholder="Part Number" readonly>
-        <input type="text" name="due_date_match" placeholder="Coincide con etiqueta" readonly>
-        <input type="text" name="batch_number" placeholder="Número de lote" readonly>
-        <br><br>
-        <button class="menu-button" type="submit">Aceptar</button>
-    </form>
+<input type="number" name="id" placeholder="ID del material" required onchange="cargarMaterial(this.value)">
+<input type="text" name="employee_id" placeholder="Número de empleado" required>
+<input type="number" name="quantity" placeholder="Cantidad consumida (g)" required>
 
+ <!-- Selecciona el Part Number; este SÍ se envía -->
+  <select name="part_number" required>
+      <option value="">Seleccione Part Number</option>
+      {% for r in resinas %}
+      <option value="{{ r.part_number }}">{{ r.part_number }}</option>
+      {% endfor %}
+  </select>
+
+  <br><br>
+  <button class="menu-button" type="submit">Aceptar</button>
+</form>
     <h3 style="margin-top: 40px;">Historial de Consumo</h3>
     <table>
-        <thead>
-            <tr>
-                <th>ID Baja</th>
-                <th>Stock ID</th>
-                <th>Empleado</th>
-                <th>Fecha</th>
-                <th>Cantidad</th>
-                <th>Comentarios</th>
-            </tr>
-        </thead>
-        <tbody>
-            
-{% for c in consumos %}
-<tr>
-    <td>{{ c.id }}</td>
-    <td>{{ c.stock_id }}</td>
-    <td>{{ c.empleado }}</td>
-    <td>{{ c.fecha }}</td>
-    <td>{{ c.cantidad }}</td>
-    <td>{{ c.comentarios }}</td>
-</tr>
-{% endfor %}
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Part Number</th>
+      <th>Empleado</th>
+      <th>Fecha</th>
+      <th>Cantidad (g)</th>
+      <th>Comentarios</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for c in consumos %}
+    <tr>
+      <td>{{ c.id }}</td>
+      <td>{{ c.part_number }}</td>
+      <td>{{ c.empleado }}</td>
+      <td>{{ c.fecha }}</td>
+      <td>{{ c.cantidad }}</td>
+      <td>{{ c.comentarios }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 
-        </tbody>
-    </table>
 </div>
 
 <script>
