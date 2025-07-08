@@ -154,6 +154,7 @@ def refrigerador_1():
     consumos = Consumo.query.order_by(Consumo.fecha.desc()).all()
     return render_template('refrigerador_1.html', resinas=resinas, stock_items=stock_items, consumos=consumos)
 
+
 @app.route('/upload_datasheet/<part_number>', methods=['GET', 'POST'])
 def upload_datasheet(part_number):
     if request.method == 'POST':
@@ -256,21 +257,6 @@ def get_bajas():
         'comments': b.comments
     } for b in bajas])
 
-@app.route('/refrigerador_1')
-def refrigerador_1():
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
-    cursor.execute("SELECT DISTINCT part_number FROM insumos")  # ← tu tabla real
-    rows = cursor.fetchall()
-    conn.close()
-    
-    insumos = [{'part_number': row[0]} for row in rows]
-    return render_template('refrigerador_1.html', insumos=insumos)
-
-@app.route('/refrigerador_2')
-def refrigerador_2():
-    return render_template('refrigerador_2.html')
-
 
 @app.route('/rack_1')
 def rack_1():
@@ -322,31 +308,20 @@ class Consumo(db.Model):
 
 @app.route('/registrar_consumo', methods=['POST'])
 def registrar_consumo():
-    data = request.get_json()
-    print("📥 Datos recibidos en /registrar_consumo:", data)
-
-    if not data:
-        return jsonify({'status': 'error', 'message': 'No se recibió JSON'}), 400
-
-    try:
-        nuevo = Consumo(
-            stock_id      = data.get('id'),
-            empleado      = data.get('employee_id'),
-            cantidad      = float(data.get('quantity')),
-            part_number   = data.get('part_number'),
-            descripcion   = '',
-            coincide      = '',
-            lote          = '',
-            comentarios   = f"Consumo registrado por empleado {data.get('employee_id', '')}"
-        )
-        db.session.add(nuevo)
-        db.session.commit()
-        return jsonify({'status': 'success'})
-    
-    except Exception as e:
-        print("❌ ERROR en registrar_consumo:", e)
-        return jsonify({'status': 'error', 'message': str(e)}), 500
-
+    data = request.json
+    nuevo = Consumo(
+        stock_id=data['id'],
+        empleado=data['employee_id'],
+        cantidad=data['quantity'],
+        descripcion=data['material_description'],
+        part_number=data['part_number'],
+        coincide=data['due_date_match'],
+        lote=data['batch_number'],
+        comentarios=f"Consumo registrado por empleado {data['employee_id']}"
+    )
+    db.session.add(nuevo)
+    db.session.commit()
+    return jsonify({'status': 'success'})
 
 
 @app.route('/chart')
@@ -456,31 +431,16 @@ def mostrar_qr_en_tabla(id):
     return f'<img src="/{ruta_qr}" alt="QR" width="80">'
 
 @app.route('/aeronaves')
-def aeronaves():
-    return render_template('aeronaves_menu.html')
-
-@app.route('/aeronaves')
-def aeronaves():
-    # Obtener todas las matrículas únicas que aún tienen componentes en el taller
-    aircrafts = db.session.query(Component.aircraft_registration)\
-        .filter((Component.output_date == None) | (Component.output_date == ''))\
-        .distinct().all()
-    aircrafts = [a[0] for a in aircrafts if a[0]]
-    return render_template('aeronaves_menu.html', aircrafts=aircrafts)
-
-@app.route('/aeronaves')
 def aeronaves_menu():
-    # Solo aeronaves con componentes activos (sin salida registrada)
+    # Obtener todas las matrículas únicas con componentes activos (sin salida)
     aircrafts = db.session.query(Component.aircraft_registration)\
-        .filter(Component.aircraft_registration != None)\
+        .filter(Component.aircraft_registration.isnot(None))\
         .filter(Component.aircraft_registration != '')\
         .filter((Component.output_date == None) | (Component.output_date == ''))\
         .distinct().all()
-    
-    aircrafts = [a[0] for a in aircrafts]  # Convertimos [(“XA-ABC”,), (“XB-DEF”,)] en [“XA-ABC”, “XB-DEF”]
+
+    aircrafts = [a[0] for a in aircrafts if a[0]]
     return render_template('aeronaves_menu.html', aircrafts=aircrafts)
-
-
 
 @app.route('/aeronave/<registration>')
 def aeronave_detalle(registration):
