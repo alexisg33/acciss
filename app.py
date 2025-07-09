@@ -442,20 +442,6 @@ def aeronaves_menu():
     aircrafts = [a[0] for a in aircrafts if a[0]]
     return render_template('aeronaves_menu.html', aircrafts=aircrafts)
 
-@app.route('/aeronave/<registration>')
-def aeronave_detalle(registration):
-    return f"Aquí se mostrarán los datos de la aeronave {registration}"
-
-@app.route('/aeronave/<registration>')
-def aeronave_detalle(registration):
-    # Aquí puedes filtrar los componentes que pertenecen a esa aeronave
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM components WHERE aircraft_registration = ?", (registration,))
-    componentes = cursor.fetchall()
-    conn.close()
-
-    return render_template('aeronave_detalle.html', registration=registration, componentes=componentes)
 
 if __name__ == '__main__':
     with app.app_context():
