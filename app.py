@@ -257,6 +257,10 @@ def get_bajas():
         'comments': b.comments
     } for b in bajas])
 
+@app.route('/refrigerador_2')
+def refrigerador_2():
+    return "<h1>Refrigerador 2 - En construcción</h1>"
+
 
 @app.route('/rack_1')
 def rack_1():
@@ -430,17 +434,6 @@ def mostrar_qr_en_tabla(id):
         return "QR no encontrado", 404
     return f'<img src="/{ruta_qr}" alt="QR" width="80">'
 
-@app.route('/aeronaves')
-def aeronaves_menu():
-    # Obtener todas las matrículas únicas con componentes activos (sin salida)
-    aircrafts = db.session.query(Component.aircraft_registration)\
-        .filter(Component.aircraft_registration.isnot(None))\
-        .filter(Component.aircraft_registration != '')\
-        .filter((Component.output_date == None) | (Component.output_date == ''))\
-        .distinct().all()
-
-    aircrafts = [a[0] for a in aircrafts if a[0]]
-    return render_template('aeronaves_menu.html', aircrafts=aircrafts)
 
 
 if __name__ == '__main__':
