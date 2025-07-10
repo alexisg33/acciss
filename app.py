@@ -313,19 +313,22 @@ class Consumo(db.Model):
 @app.route('/registrar_consumo', methods=['POST'])
 def registrar_consumo():
     data = request.json
+    item = StockItem.query.get(data['id'])  # o Consumo, según corresponda
+
     nuevo = Consumo(
-        stock_id=data['id'],
-        empleado=data['employee_id'],
-        cantidad=data['quantity'],
-        descripcion=data['material_description'],
-        part_number=data['part_number'],
-        coincide=data['due_date_match'],
-        lote=data['batch_number'],
-        comentarios=f"Consumo registrado por empleado {data['employee_id']}"
+        stock_id = item.id,
+        empleado = data['employee_id'],
+        cantidad = data['quantity'],
+        descripcion    = item.material_description,
+        part_number    = item.part_number,
+        coincide       = item.due_date_match,
+        lote           = item.batch_number,
+        comentarios    = f"Consumo registrado por empleado {data['employee_id']}"
     )
     db.session.add(nuevo)
     db.session.commit()
     return jsonify({'status': 'success'})
+
 
 
 @app.route('/chart')
