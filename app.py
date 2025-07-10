@@ -443,6 +443,27 @@ def mostrar_qr_en_tabla(id):
     return f'<img src="/{ruta_qr}" alt="QR" width="80">'
 
 
+import os
+
+@app.route('/upload_datasheet/<part_number>', methods=['GET', 'POST'])
+def upload_datasheet(part_number):
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            return 'No file part'
+        file = request.files['file']
+        if file.filename == '':
+            return 'No selected file'
+        if file and allowed_file(file.filename):
+            filename = secure_filename(f"{part_number}.pdf")
+            # Crear la carpeta si no existe
+            folder = os.path.join(app.static_folder, 'datasheets')
+            os.makedirs(folder, exist_ok=True)
+            file.save(os.path.join(folder, filename))
+            return redirect(url_for('refrigerador_1'))
+
+    return render_template('upload_datasheet.html', part_number=part_number)
+
+
 
 if __name__ == '__main__':
     with app.app_context():
