@@ -230,6 +230,7 @@
   </tbody>
 </table>
 
+
 </div>
 
 <script>
@@ -350,5 +351,31 @@ async function enviarConsumo(event) {
     }
 }
 </script>
+<!-- ... aquí van todos tus divs y contenido ... -->
+
+<!-- Botón fijo de Volver al Inicio, siempre visible -->
+<button onclick="location.href='{{ url_for('index') }}'" 
+        style="
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            cursor: pointer;
+            z-index: 9999;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 16 16">
+        <path d="M8 .5l6.364 6.364-1.414 1.414L8 3.328 3.05 8.278 1.636 6.864z"/>
+        <path d="M2 13.5V7h2v6h3v-4h2v4h3V7h2v6.5H2z"/>
+    </svg>
+    Inicio
+</button>
 </body>
 </html>
