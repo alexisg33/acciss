@@ -2,9 +2,378 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Nombre del módulo</Refrigerador 2>
+    <title>Refrigerador 2 - A.C.C.I.S.S.</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(to bottom, #e4f9e8, #ffffff);
+            padding: 40px;
+        }
+        h2 {
+            color:rgb(46, 125, 125);
+            text-align: center;
+        }
+        .button-group {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .menu-button {
+            background-color: #43a047;
+            color: white;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            margin: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .menu-button:hover {
+            background-color:rgb(32, 129, 158);
+        }
+        .content-section {
+            display: none;
+            width: 95%;
+            margin: 0 auto 40px auto;
+        }
+        .content-section.active {
+            display: block;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            font-size: 0.9em;
+        }
+        th, td {
+            padding: 8px;
+            border: 1px solid #b2dfdb;
+            text-align: center;
+        }
+        th {
+            background-color: #66bb6a;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f1f8e9;
+        }
+        input, select {
+            width: 100%;
+            padding: 4px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
-    <h2>Módulo: Nombre del módulo (en construcción)</h2>
+
+<h2>Refrigerador 2 - Gestión de Insumos (±4°C)</h2>
+
+<div class="button-group">
+    <button class="menu-button" onclick="toggleSection('info')">Información de Insumos</button>
+    <button class="menu-button" onclick="toggleSection('stock')">Existencias / Stock</button>
+    <button class="menu-button" onclick="toggleSection('consumo')">Registrar Consumo</button>
+</div>
+
+<div id="info" class="content-section active">
+    <h3>Información de Insumos</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Material</th>
+                <th>Part Number</th>
+                <th>Base (A)</th>
+                <th>Hardener (B)</th>
+                <th>Datasheet</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in resinas %}
+            <tr>
+                <td>{{ r.material }}</td>
+                <td>{{ r.part_number }}</td>
+                <td>{{ r.base }}</td>
+                <td>{{ r.hardener }}</td>
+                <td>
+                    <a href="{{ url_for('upload_datasheet', part_number=r.part_number) }}" class="menu-button">Subir</a>
+                    {% if r.part_number %}
+                        <a href="{{ url_for('static', filename='datasheets/' ~ r.part_number ~ '.pdf') }}" class="menu-button" target="_blank">Ver</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div id="stock" class="content-section">
+    <h3>Existencias / Stock</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Material Description</th>
+                <th>Part Number</th>
+                <th>Hazards Identified (GHS)</th>
+                <th>Date</th>
+                <th>Quantity</th>
+                <th>After Open</th>
+                <th>Expiration Date</th>
+                <th>Due Date Match With Material Tag</th>
+                <th>Batch Number</th>
+                <th>Comments</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in stock_items %}
+            <tr>
+                <td>{{ item.id }}</td>
+                <td>{{ item.material_description }}</td>
+                <td>{{ item.part_number }}</td>
+                <td>{{ item.hazards_identified }}</td>
+                <td>{{ item.date }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.after_open }}</td>
+                <td>{{ item.expiration_date }}</td>
+                <td>{{ item.due_date_match }}</td>
+                <td>{{ item.batch_number }}</td>
+                <td>{{ item.comments }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div style="text-align: center; margin-top: 30px;">
+        <button class="menu-button" onclick="toggleForm('resina-form')">Registrar entrada</button>
+        <button class="menu-button" onclick="toggleForm('baja-form')">Registrar salida</button>
+    </div>
+
+    <div id="resina-form" style="display:none; margin-top: 20px;">
+        <h4>Registrar Entrada</h4>
+        <form onsubmit="return enviarRegistro(event)">
+            <input type="text" name="employee_id" placeholder="Número de empleado" required>
+            <select name="part_number" onchange="rellenarDesdeInfo(this.value)" required>
+                <option value="">Seleccione Part Number</option>
+                {% for r in resinas %}
+                <option value="{{ r.part_number }}">{{ r.part_number }}</option>
+                {% endfor %}
+            </select>
+            <input type="text" name="material_description" placeholder="Descripción del material" readonly>
+            <input type="text" name="hazards_identified" placeholder="Peligros identificados (GHS)">
+            <input type="number" name="quantity" placeholder="Cantidad" required>
+            <input type="text" name="after_open" placeholder="Después de abrir">
+            <input type="date" name="expiration_date" placeholder="Fecha de caducidad">
+            <input type="text" name="due_date_match" placeholder="Coincide con etiqueta">
+            <input type="text" name="batch_number" placeholder="Número de lote">
+            <input type="text" name="comments" placeholder="Comentarios">
+            <br><br>
+            <button class="menu-button" type="submit">Aceptar</button>
+        </form>
+    </div>
+
+    <div id="baja-form" style="display:none; margin-top: 20px;">
+        <h4>Registrar Baja</h4>
+        <form onsubmit="return enviarBaja(event)">
+            <input type="number" name="id" placeholder="ID del material" required onchange="cargarMaterial(this.value)">
+            <input type="text" name="employee_id" placeholder="Número de empleado" required>
+            <input type="number" name="quantity" placeholder="Cantidad a dar de baja" required>
+            <input type="text" name="material_description" placeholder="Descripción del material" readonly>
+            <input type="text" name="part_number" placeholder="Part Number" readonly>
+            <input type="text" name="due_date_match" placeholder="Coincide con etiqueta" readonly>
+            <input type="text" name="batch_number" placeholder="Número de lote" readonly>
+            <br><br>
+            <button class="menu-button" type="submit">Aceptar</button>
+        </form>
+    </div>
+</div>
+
+<div id="consumo" class="content-section">
+    <h3>Registrar Consumo</h3>
+
+<form onsubmit="enviarConsumo(event)">
+    <input type="number" name="id" placeholder="ID del material" required onchange="cargarMaterial(this.value)">
+    <input type="text" name="employee_id" placeholder="Número de empleado" required>
+    <input type="number" name="quantity" placeholder="Cantidad consumida (g)" required>
+    <select name="part_number" required>
+        <option value="">Seleccione Part Number</option>
+        {% for r in resinas %}
+        <option value="{{ r.part_number }}">{{ r.part_number }}</option>
+        {% endfor %}
+    </select>
+    <br><br>
+    <button class="menu-button" type="submit">Aceptar</button>
+</form>
+    <h3 style="margin-top: 40px;">Historial de Consumo</h3>
+    <table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Part Number</th>
+      <th>Empleado</th>
+      <th>Fecha</th>
+      <th>Cantidad (g)</th>
+      <th>Comentarios</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for c in consumos %}
+    <tr>
+      <td>{{ c.id }}</td>
+      <td>{{ c.part_number }}</td>
+      <td>{{ c.empleado }}</td>
+      <td>{{ c.fecha }}</td>
+      <td>{{ c.cantidad }}</td>
+      <td>{{ c.comentarios }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+
+</div>
+
+<script>
+function toggleSection(id) {
+    document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.remove('active');
+    });
+    document.getElementById(id).classList.add('active');
+}
+
+function toggleForm(id) {
+    const el = document.getElementById(id);
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+async function cargarMaterial(id) {
+    const response = await fetch('/get_material_info/' + id);
+    const material = await response.json();
+    if (material) {
+        document.querySelector('[name="material_description"]').value = material.material_description;
+        document.querySelector('[name="part_number"]').value = material.part_number;
+        document.querySelector('[name="due_date_match"]').value = material.due_date_match;
+        document.querySelector('[name="batch_number"]').value = material.batch_number;
+    } else {
+        alert('Material no encontrado');
+    }
+}
+
+function rellenarDesdeInfo(partNumber) {
+    const fila = [...document.querySelectorAll('#info table tbody tr')].find(tr => tr.children[1].textContent === partNumber);
+    if (fila) {
+        document.querySelector('[name="material_description"]').value = fila.children[0].textContent;
+    }
+}
+
+async function enviarBaja(event) {
+    event.preventDefault();
+    const form = event.target;
+    const datos = Object.fromEntries(new FormData(form));
+    const response = await fetch('/registrar_baja_r2', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(datos)
+    });
+    const result = await response.json();
+    if (result.status === 'success') {
+        alert('Registro exitoso');
+        form.reset();
+        location.reload();
+    } else {
+        alert('Error: ' + result.message);
+    }
+}
+
+async function enviarRegistro(event) {
+    event.preventDefault();
+    const form = event.target;
+    const datos = Object.fromEntries(new FormData(form));
+    const response = await fetch('/registrar_resina_r2', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(datos)
+    });
+    const result = await response.json();
+    if (result.status === 'success') {
+        alert('Entrada registrada');
+        form.reset();
+        location.reload();
+    } else {
+        alert('Error al registrar entrada');
+    }
+}
+
+function autocompletarDatos() {
+    const idInput = document.querySelector('input[name="stock_id"]');
+    if (!idInput) return;
+
+    idInput.addEventListener('change', async () => {
+        const id = idInput.value;
+        if (id) {
+            const response = await fetch(`/get_material/${id}`);
+            if (response.ok) {
+                const data = await response.json();
+                document.querySelector('input[name="descripcion"]').value = data.descripcion || '';
+                document.querySelector('input[name="part_number"]').value = data.part_number || '';
+            } else {
+                alert("Material no encontrado");
+                document.querySelector('input[name="descripcion"]').value = '';
+                document.querySelector('input[name="part_number"]').value = '';
+            }
+        }
+    });
+}
+
+window.onload = autocompletarDatos;
+</script>
+
+
+<script>
+async function enviarConsumo(event) {
+    event.preventDefault();            // detiene el envío clásico
+    const form  = event.target;
+    const datos = Object.fromEntries(new FormData(form));
+
+    const res = await fetch('/registrar_consumo_r2', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(datos)
+    });
+
+    const result = await res.json();
+    if (result.status === 'success') {
+        alert('Consumo registrado correctamente');
+        form.reset();
+        location.reload();             // recarga para ver la fila nueva
+    } else {
+        alert('Error al registrar consumo');
+    }
+}
+</script>
+<button onclick="location.href='{{ url_for('index') }}'" 
+        style="
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            cursor: pointer;
+            margin: 40px auto 20px auto;
+            display: block;
+            width: fit-content;
+        ">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 16 16">
+        <path d="M8 .5l6.364 6.364-1.414 1.414L8 3.328 3.05 8.278 1.636 6.864z"/>
+        <path d="M2 13.5V7h2v6h3v-4h2v4h3V7h2v6.5H2z"/>
+    </svg>
+    Inicio
+</button>
+
 </body>
 </html>
