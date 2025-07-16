@@ -425,6 +425,7 @@ def generar_qr_componente(id):
         return "Componente no encontrado", 404
 
     texto_qr = f"""
+Matrícula: {componente.aircraft_registration or 'N/A'}
 ID: {componente.id}
 PN: {componente.part_number}
 SN: {componente.serial_number}
