@@ -409,6 +409,13 @@ class StockMaterial(db.Model):
     material_description = db.Column(db.String)
     part_number = db.Column(db.String)
     # otros campos...
+    class StockR2(db.Model):
+        __tablename__ = 'stock_r2'
+    id = db.Column(db.Integer, primary_key=True)
+    part_number = db.Column(db.String)
+    quantity = db.Column(db.Integer)
+    # Agrega aquí los campos que estés usando en la tabla refrigerador 2
+
 
 
 @app.route('/get_material/<int:stock_id>')
