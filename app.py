@@ -1,12 +1,22 @@
 # app.py - Versión final corregida
-
 import os
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from werkzeug.utils import secure_filename
 from flask import redirect
 from utils_qr import generar_qr
+
+# Crear la app
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///acciss.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+# Inicializar Flask-Migrate
+migrate = Migrate(app, db)
+
 
 
 app = Flask(__name__)
@@ -409,12 +419,28 @@ class StockMaterial(db.Model):
     material_description = db.Column(db.String)
     part_number = db.Column(db.String)
     # otros campos...
-    class StockR2(db.Model):
-        __tablename__ = 'stock_r2'
+class StockR2(db.Model):
+    __tablename__ = 'stock_r2'
     id = db.Column(db.Integer, primary_key=True)
+    material_description = db.Column(db.String)
     part_number = db.Column(db.String)
     quantity = db.Column(db.Integer)
-    # Agrega aquí los campos que estés usando en la tabla refrigerador 2
+    aircraft_registration = db.Column(db.String)
+    shelf = db.Column(db.String)
+    tray = db.Column(db.String)
+    batch_number = db.Column(db.String)
+    due_date_match = db.Column(db.String)
+    last_entry_date = db.Column(db.String)
+    qr_code_path = db.Column(db.String)
+
+class ConsumoR2(db.Model):
+    __tablename__ = 'consumo_r2'
+    id = db.Column(db.Integer, primary_key=True)
+    employee_id = db.Column(db.String)
+    quantity = db.Column(db.Integer)
+    part_number = db.Column(db.String)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
 
 
 
