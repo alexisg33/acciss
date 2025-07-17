@@ -271,7 +271,10 @@ def get_bajas():
 
 @app.route('/refrigerador_2')
 def refrigerador_2():
-    return "<h1>Refrigerador 2 - En construcción</h1>"
+    materiales = Resina.query.all()
+    stock = Stock.query.all()
+    consumo = Consumo.query.all()
+    return render_template('refrigerador_2.html', materiales=materiales, stock=stock, consumo=consumo)
 
 
 @app.route('/rack_1')
@@ -450,6 +453,16 @@ def mostrar_qr_en_tabla(id):
         return "QR no encontrado", 404
     return f'<img src="/{ruta_qr}" alt="QR" width="80">'
 
+@app.route('/aeronaves')
+def aeronaves_menu():
+    aircrafts = db.session.query(Component.aircraft_registration)\
+        .filter(Component.aircraft_registration != None)\
+        .filter(Component.aircraft_registration != '')\
+        .filter((Component.output_date == None) | (Component.output_date == ''))\
+        .distinct().all()
+    
+    aircrafts = [a[0] for a in aircrafts]
+    return render_template('aeronaves_menu.html', aircrafts=aircrafts)
 
 
 

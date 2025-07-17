@@ -2,86 +2,17 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Panel de Aeronaves</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #f4f9ff;
-            margin: 0;
-            padding: 20px;
-            text-align: center;
-        }
-
-        h1 {
-            color: #004080;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .card {
-            background-color: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
-            cursor: pointer;
-        }
-
-        .card:hover {
-            transform: scale(1.03);
-        }
-
-        .matricula {
-            font-size: 20px;
-            color: #0066cc;
-            font-weight: bold;
-        }
-
-        .boton-ver {
-            margin-top: 10px;
-            display: inline-block;
-            padding: 6px 14px;
-            background-color: #007acc;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            text-decoration: none;
-        }
-
-        .boton-ver:hover {
-            background-color: #005fa3;
-        }
-
-        .volver {
-            margin-top: 40px;
-            display: inline-block;
-            padding: 10px 16px;
-            background-color: #ccc;
-            color: #333;
-            border-radius: 6px;
-            text-decoration: none;
-        }
-    </style>
+    <title>Menú de Aeronaves</title>
 </head>
 <body>
-
-    <h1>Panel de Aeronaves</h1>
-
-    <div class="grid">
-        {% for aircraft in aircrafts %}
-            <div class="card">
-                <div class="matricula">{{ aircraft }}</div>
-                <a href="{{ url_for('aeronave_detalle', registration=aircraft) }}" class="boton-ver">Ver detalles</a>
-            </div>
+    <h1>Aeronaves en el sistema</h1>
+    <ul>
+        {% for registration in aircrafts %}
+            <li><a href="{{ url_for('aeronave_detalle', registration=registration) }}">{{ registration }}</a></li>
+        {% else %}
+            <li>No hay aeronaves registradas aún.</li>
         {% endfor %}
-    </div>
-
-    <a href="{{ url_for('index') }}" class="volver">Volver al menú principal</a>
-
+    </ul>
+    <a href="/">Volver al inicio</a>
 </body>
 </html>
