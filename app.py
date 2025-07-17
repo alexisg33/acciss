@@ -269,7 +269,6 @@ def get_bajas():
         'comments': b.comments
     } for b in bajas])
 
-from models import StockMaterial  # o desde donde lo tengas definido
 
 @app.route('/refrigerador_2')
 def refrigerador_2():
