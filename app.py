@@ -269,12 +269,14 @@ def get_bajas():
         'comments': b.comments
     } for b in bajas])
 
+from models import StockMaterial  # o desde donde lo tengas definido
+
 @app.route('/refrigerador_2')
 def refrigerador_2():
-    materiales = Resina.query.all()
-    stock = Stock.query.all()
-    consumo = Consumo.query.all()
-    return render_template('refrigerador_2.html', materiales=materiales, stock=stock, consumo=consumo)
+    resinas = StockMaterial.query.all()  # usamos el modelo correcto aquí
+    stock_items = StockR2.query.all()
+    consumos = ConsumoR2.query.order_by(ConsumoR2.fecha.desc()).all()
+    return render_template('refrigerador_2.html', resinas=resinas, stock_items=stock_items, consumos=consumos)
 
 
 @app.route('/rack_1')
@@ -464,6 +466,14 @@ def aeronaves_menu():
     aircrafts = [a[0] for a in aircrafts]
     return render_template('aeronaves_menu.html', aircrafts=aircrafts)
 
+@app.route('/aeronave/<registration>')
+def aeronave_detalle(registration):
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM components WHERE aircraft_registration = ?", (registration,))
+    componentes = cursor.fetchall()
+    conn.close()
+    return render_template('aeronave_detalle.html', registration=registration, componentes=componentes)
 
 
 if __name__ == '__main__':
